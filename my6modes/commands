@@ -1,0 +1,1 @@
+for i (0 1 2 3 4 5); do python3 createAllmodesMC.py $i; done

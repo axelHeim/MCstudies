@@ -1,0 +1,41 @@
+# mode4
+
+# turns off Photos which created QED correction -> additional photons
+noPhotos
+
+
+
+Decay Upsilon(4S)
+1.0 B- B+ VSS;
+Enddecay
+
+
+#SVS didnt work "EvtGen:SVS did not get the correct daughter spin d=0"
+Decay B-
+1.0 pi- pi-  D+  PHSP;
+Enddecay
+
+
+Decay D+
+1.0 pi+ pi0 PHSP;
+Enddecay
+
+Decay B+
+1.0 pi- pi+ pi+ anti-D*0  PHSP;
+Enddecay
+
+Decay anti-D*0
+1.0 anti-D0 pi0 PHSP;
+Enddecay
+
+Decay pi0
+1.0 gamma gamma PHSP;
+Enddecay
+
+Decay anti-D0
+1.0 K+ pi- PHSP;
+Enddecay
+
+
+
+End
