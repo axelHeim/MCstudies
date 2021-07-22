@@ -6,6 +6,8 @@ import reconstruction as re
 import mdst
 import sys
 
+nfs_path = "/nfs/dust/belle2/user/axelheim/MC_studies/my6modes"
+
 mode = sys.argv[1]
 print("passed mode:", mode)
 num_perTree = 100
@@ -38,7 +40,7 @@ ge.add_evtgen_generator(
 #re.add_reconstruction(path=main)
 
 # Create the mDST output file
-mdst.add_mdst_output(path=main, filename="./rootfiles/mode{}_{}_events.root".format(mode,num_perTree))
+mdst.add_mdst_output(path=main, filename=nfs_path + "/rootfiles/noSim_noReco/mode{}_{}_events.root".format(mode,num_perTree))
 
 # Process the steering path
 b2.process(path=main)
