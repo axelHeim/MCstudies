@@ -10,7 +10,7 @@ nfs_path = "/nfs/dust/belle2/user/axelheim/MC_studies/my6modes"
 
 mode = sys.argv[1]
 print("passed mode:", mode)
-num_perTree = 100
+num_perTree = 15000
 
 num_modes = 6
 
