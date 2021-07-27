@@ -7,13 +7,15 @@ mode = sys.argv[1]
 print("passed mode:", mode)
 
 nfs_path = "/nfs/dust/belle2/user/axelheim/MC_studies/my6modes"
-events_num_identifier = "_15000_events"
+root_subdir = "wSim_wReco"
+
+events_num_identifier = "_10_events"
 # create path
 path = b2.create_path()
 
 # load input ROOT file
 ma.inputMdst(environmentType='default',
-             filename=b2.find_file(nfs_path + f"/rootfiles/noSim_noReco/mode{mode}" + events_num_identifier + ".root"),
+             filename=b2.find_file(nfs_path + "/rootfiles/" + root_subdir + f"/mode{mode}" + events_num_identifier + ".root"),
              path=path)
 
 
@@ -54,17 +56,18 @@ for i in range(4): # 4 deepest decay tree number of decays
  
 #ma.variablesToNtuple('Upsilon(4S):all', variables=var, filename='myFSP_nTuples_mode0.root', path=path)
 file_extension = f"_nTuples_mode{mode}" + events_num_identifier + ".root"
+print("example path to save data:", nfs_path + '/rootfiles/' + root_subdir + '/gamma' + file_extension)
 ma.variablesToNtuple('gamma:gen',
                      variables=var,
-                     filename=nfs_path + '/rootfiles/noSim_noReco/gamma' + file_extension,
+                     filename=nfs_path + '/rootfiles/' + root_subdir + '/gamma' + file_extension,
                      path=path)
 ma.variablesToNtuple('K+:gen',
                      variables=var,
-                     filename=nfs_path + '/rootfiles/noSim_noReco/K' + file_extension,
+                     filename=nfs_path + '/rootfiles/' + root_subdir + '/K' + file_extension,
                      path=path)
 ma.variablesToNtuple('pi+:gen',
                      variables=var,
-                     filename=nfs_path + '/rootfiles/noSim_noReco/pi' + file_extension,
+                     filename=nfs_path + '/rootfiles/' + root_subdir + '/pi' + file_extension,
                      path=path)
 #ma.variablesToNtuple('all:gen',  variables=var, filename='allP_nTuples_mode0.root',  path=path)
 # process the events

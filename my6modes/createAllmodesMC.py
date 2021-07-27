@@ -7,10 +7,11 @@ import mdst
 import sys
 
 nfs_path = "/nfs/dust/belle2/user/axelheim/MC_studies/my6modes"
-
+root_subdir = "wSim_wReco"
 mode = sys.argv[1]
 print("passed mode:", mode)
-num_perTree = 15000
+num_perTree = int(sys.argv[2])
+print("events to create:", num_perTree)
 
 num_modes = 6
 
@@ -27,20 +28,22 @@ main.add_module('Progress')
 ge.add_evtgen_generator(
     path=main,
     finalstate='signal',
-    signaldecfile=b2.find_file('./decfiles/mode{}.dec'.format(mode))
+    signaldecfile=b2.find_file('/afs/desy.de/user/a/axelheim/private/MC_studies/my6modes/decfiles/mode{}.dec'.format(mode))
 )
 
 # Simulate the detector response
-#si.add_simulation(path=main)
+si.add_simulation(path=main)
 
 # Simulate the L1 trigger
-#l1.add_tsim(path=main)
+l1.add_tsim(path=main)
 
 # Reconstruct the objects
-#re.add_reconstruction(path=main)
+re.add_reconstruction(path=main)
 
 # Create the mDST output file
-mdst.add_mdst_output(path=main, filename=nfs_path + "/rootfiles/noSim_noReco/mode{}_{}_events.root".format(mode,num_perTree))
+outpath = nfs_path + "/rootfiles/" + root_subdir + "/mode{}_{}_events.root".format(mode,num_perTree)
+print("\n \n \n \n save data to:",outpath)
+mdst.add_mdst_output(path=main, filename=outpath)
 
 # Process the steering path
 b2.process(path=main)
