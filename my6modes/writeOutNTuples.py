@@ -35,14 +35,17 @@ var = ['M',
        'x', 'y', 'z'
        ]
 
-#ma.matchMCTruth("gamma:gen", path=path)
+ma.matchMCTruth("gamma:gen", path=path)
+ma.matchMCTruth("pi+:gen", path=path)
+ma.matchMCTruth("K+:gen", path=path)
 var +=  vc.kinematics 
 var.append("kaonID")
 var.append("pionID")
 #var +=  "pionID" 
 
-var += vc.mc_truth
+var += vc.mc_truth 
 var.append("mcPhotos")
+var.append("mcInitial")
 var.append("charge")
 var.append("uniqueParticleIdentifier")
 
