@@ -19,16 +19,16 @@ ma.inputMdst(environmentType='default',
              path=path)
 
 
-
-
-ma.fillParticleListsFromMC([('K+:gen', ''),# ('K-:gen', ''),
-                    ('pi+:gen', ''),# ('pi-:gen', ''),
+ma.fillParticleLists([('K+:gen', ''),
+                    ('pi+:gen', ''),
                     ('gamma:gen', "")], path=path)
-# generate the decay string
-#path.add_module('ParticleMCDecayString', listName='J/psi', fileName='hashmap_Jpsi_from_B2A502.root')
 
-#ma.copyLists('Upsilon(4S):all', ['K+:gen','K-:gen','pi+:gen','pi-:gen','gamma:gen'], path=path)
-
+""" ma.fillParticleListsFromMC([('K+:gen', ''),
+                    ('pi+:gen', ''),
+                    ('gamma:gen', "")], path=path)
+ """
+ 
+ 
 
 # write out ntuples
 var = ['M',
@@ -47,6 +47,7 @@ var += vc.mc_truth
 var.append("mcPhotos")
 var.append("mcPrimary")
 var.append("mcInitial")
+var.append("hasAncestor(300553.0)")
 var.append("charge")
 var.append("uniqueParticleIdentifier")
 
