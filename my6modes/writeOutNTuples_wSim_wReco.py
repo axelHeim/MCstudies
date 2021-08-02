@@ -19,16 +19,15 @@ ma.inputMdst(environmentType='default',
              path=path)
 
 
-ma.fillParticleLists([('K+:gen', ''),
-                    ('pi+:gen', ''),
-                    ('gamma:gen', "")], path=path)
+ma.fillParticleLists([('K+:gen', "dr < 2 and abs(dz) < 4 and pt > 0.3 and kaonID > 0.6 \
+and pionID<0.6 and muonID < 0.9 and electronID < 0.9  and theta > 0.297 \
+and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1"),
+                    ('pi+:gen', "dr < 2 and abs(dz) < 4 and pt > 0.3 and pionID > 0.6 \
+and kaonID < 0.6 and electronID < 0.9 and  muonID < 0.9 and theta > 0.297 \
+and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1"),
+                    ('gamma:gen', "E > 0.1 and 0.296706 < theta < 2.61799")], path=path)
 
-""" ma.fillParticleListsFromMC([('K+:gen', ''),
-                    ('pi+:gen', ''),
-                    ('gamma:gen', "")], path=path)
- """
- 
- 
+
 
 # write out ntuples
 var = ['M',
