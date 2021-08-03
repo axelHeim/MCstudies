@@ -56,8 +56,8 @@ for i in range(4): # 4 deepest decay tree number of decays
     #print(tmp_var)
     var.append(tmp_var)
 
-#ma.combineAllParticles(['K+:gen','K-:gen','pi+:gen','pi-:gen','gamma:gen'], 'all:gen', path=path)
- 
+# ma.combineAllParticles(['K+:gen','K-:gen','pi+:gen','pi-:gen','gamma:gen'], 'all:gen', path=path)
+
 #ma.variablesToNtuple('Upsilon(4S):all', variables=var, filename='myFSP_nTuples_mode0.root', path=path)
 file_extension = f"_nTuples_mode{mode}" + events_num_identifier + ".root"
 print("example path to save data:", nfs_path + '/rootfiles/' + root_subdir + '/gamma' + file_extension)
