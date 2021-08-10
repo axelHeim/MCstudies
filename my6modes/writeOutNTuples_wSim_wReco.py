@@ -41,8 +41,12 @@ var +=  vc.kinematics
 var.append("kaonID")
 var.append("pionID")
 #var +=  "pionID" 
-
 var += vc.mc_truth  
+var += vc.mc_variables  
+
+var.append("cosTheta")
+var.append("mcTheta")
+
 var.append("mcPhotos")
 var.append("mcPrimary")
 var.append("mcInitial")
