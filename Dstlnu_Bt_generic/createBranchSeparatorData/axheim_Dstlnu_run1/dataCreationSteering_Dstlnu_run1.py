@@ -44,7 +44,7 @@ gamma_variables = ['p', 'pt', 'useCMSFrame(p)', 'useCMSFrame(pt)', 'mcMother(PDG
 
 def define_aliases_Xl():
     alias_dict ={}
-
+#uniqueParticleIdentifier uniqParID
     alias_dict['BeamE'] = 'beamE'
     alias_dict['BeamPx'] = 'beamPx'
     alias_dict['BeamPy'] = 'beamPy'
@@ -68,17 +68,21 @@ def define_aliases_Xl():
           alias_dict[f'genUp4S_cmPy_{i}'] = f'genUpsilon4S(mcDaughter({i}, useCMSFrame(py)))'
           alias_dict[f'genUp4S_cmPz_{i}'] = f'genUpsilon4S(mcDaughter({i}, useCMSFrame(py)))'
           alias_dict[f'genUp4S_cmP_{i}'] = f'genUpsilon4S(mcDaughter({i}, useCMSFrame(p)))'
+          alias_dict[f'genUp4S_uniqParID_{i}'] = f'genUpsilon4S(mcDaughter({i}, uniqueParticleIdentifier))'
 
           for j in range(0,3):
               alias_dict[f'genUp4S_PDG_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},PDG)))'
               alias_dict[f'genUp4S_mdstIndex_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mdstIndex)))'
               alias_dict[f'genUp4S_genParticleID_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},genParticleID)))'
+              alias_dict[f'genUp4S_uniqParID_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},uniqueParticleIdentifier)))'
               if j == 0:
                 for k in range(0,2):
                    alias_dict[f'genUp4S_PDG_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},PDG))))'
                    alias_dict[f'genUp4S_mdstIndex_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mdstIndex))))'
                    alias_dict[f'genUp4S_genParticleID_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},genParticleID))))'
+                   alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},uniqueParticleIdentifier))))'
     for i in range(0,1):
+      alias_dict['Btag_uniqParID'.format(i)]= 'daughter({}, uniqueParticleIdentifier)'.format(i)
       alias_dict['dau{}_M'.format(i)]= 'daughter({}, M)'.format(i)
       alias_dict['dau{}_chiProb'.format(i)]= 'daughter({}, chiProb)'.format(i)
       alias_dict['dau{}_cmp'.format(i)]= 'useCMSFrame(daughter({}, p))'.format(i)
@@ -156,6 +160,7 @@ def define_aliases_Xl():
       alias_dict['dau{}_PDG'.format(i)]= 'daughter({},PDG)'.format(i)
       alias_dict['dau{}_motherPDG'.format(i)]= 'daughter({},genMotherPDG)'.format(i)
     for i in range(1,2):
+      alias_dict['Bsig_uniqParID'.format(i)]= 'daughter({}, uniqueParticleIdentifier)'.format(i)
       alias_dict['dau{}_Nelectrons'.format(i)]= 'daughter({},nROE_Charged(cleanMask,11))'.format(i)
       alias_dict['dau{}_Nmuons'.format(i)]= 'daughter({},nROE_Charged(cleanMask,13))'.format(i)
       alias_dict['dau{}_Npip'.format(i)]= 'daughter({},nROE_Charged(cleanMask,211))'.format(i)
@@ -228,7 +233,15 @@ def define_aliases_Xl():
       alias_dict['lep_gmotherPDG']= 'daughter(1,daughter({},genMotherPDG(1)))'.format(i)
       alias_dict['lep_genmotherID']= 'daughter(1,daughter({},genMotherID))'.format(i)
       alias_dict['lep_mothermdstIndex']= 'daughter(1,daughter({},mcMother(mdstIndex)))'.format(i)
+      alias_dict['lep_uniqParID']= 'daughter(1,daughter({},uniqueParticleIdentifier))'.format(i)
+      alias_dict['lepMother_uniqParID']= 'daughter(1,daughter({},mcMother(uniqueParticleIdentifier)))'.format(i)
     
+    for i in range(5):  
+      alias_dict['D_dau{}_genParticleID'.format(i)] = 'daughter(1,daughter(0,daughter(0,daughter({},genParticleID))))'.format(i)
+      alias_dict['D_dau{}_motherPDG'.format(i)] = 'daughter(1,daughter(0,daughter(0,daughter({},genMotherPDG))))'.format(i)
+      alias_dict['D_dau{}_gmotherPDG'.format(i)] = 'daughter(1,daughter(0,daughter(0,daughter({},genMotherPDG(1)))))'.format(i)
+      alias_dict['D_dau{}_mcPDG'.format(i)] = 'daughter(1,daughter(0,daughter(0,daughter({},mcPDG))))'.format(i)
+
     alias_dict['D_nDaughters'] = 'daughter(1,daughter(0,daughter(0,nDaughters)))'
     alias_dict['D_M'] = 'daughter(1,daughter(0,daughter(0,M)))'
     alias_dict['D_p'] = 'daughter(1,daughter(0,daughter(0,p)))'
@@ -236,6 +249,8 @@ def define_aliases_Xl():
     alias_dict['D_cmp'] = 'daughter(1,daughter(0,daughter(0,useCMSFrame(p))))'
     alias_dict['D_cmpt'] = 'daughter(1,daughter(0,daughter(0,useCMSFrame(pt))))'
     alias_dict['D_isSignal'] = 'daughter(1,daughter(0,daughter(0,isSignal)))'
+    alias_dict['D_uniqParID'] = 'daughter(1,daughter(0,daughter(0,uniqueParticleIdentifier)))'
+    alias_dict['Dst_uniqParID'] = 'daughter(1,daughter(0,uniqueParticleIdentifier))'    
     alias_dict['Dst_M'] = 'daughter(1,daughter(0,M))'
     alias_dict['Dst_E'] = 'daughter(1,daughter(0,E))'
     alias_dict['Dst_p'] = 'daughter(1,daughter(0,p))'
@@ -256,9 +271,9 @@ def define_aliases_Xl():
     alias_dict['Dst_mccmpz'] = 'daughter(1,daughter(0,useCMSFrame(mcPZ)))'
     alias_dict['Dst_DeltaM'] = 'daughter(1,daughter(0,massDifference(0)))'
     alias_dict['Dst_isSignal'] = 'daughter(1,daughter(0,isSignal))'
+    return(alias_dict)
 
-
-    # added for BranchSeparator data creation
+"""     # added for BranchSeparator data creation
     variables = ["px","py","pz","E","charge","PDG"] # uniqueParticleIdentifier
     #variables = ["uniqueParticleIdentifier"] #  
     for var in variables:
@@ -280,12 +295,13 @@ def define_aliases_Xl():
   
       # for lepton = dau1dau1
       alias_dict['lep_{}'.format(var)]= 'daughter(1,daughter(1,{}))'.format(var)
-
+    return(alias_dict)
+ """
   
 
 
 
-    return(alias_dict)
+    
 
 def add_aliases(alias_dict={}):
    for key,value in alias_dict.items():
@@ -598,12 +614,12 @@ for part_BHc_all in parts_BHc_all:
     BtagAll.append(f'B0:{parid}DXtag')
 
 
-cutAndCopyLists('B0:tag_onlyUsedOne', BtagAll, "[isDaughterOfList(Upsilon(4S):DXtag) > 0]", path=path)
-cutAndCopyLists('X:XonlyUsedOne', X_All, "[isDaughterOfList(B0:tag_onlyUsedOne) > 0]", path=path)
+cutAndCopyLists('B0:tag_onlyUsedOne', BtagAll, "[isDescendantOfList(Upsilon(4S):DXtag) == 1]", path=path)
+cutAndCopyLists('X:XonlyUsedOne', X_All, "[isDescendantOfList(B0:tag_onlyUsedOne) == 1]", path=path)
 # cannot combine all Hc's because they are different particles, sigh :/
 #cutAndCopyLists('X:HcOnlyUsedOne', HcAll, "[isDaughterOfList(B0:tag_onlyUsedOne) > 0]", path=path)
 
-cutAndCopyList('B0:sig_onlyUsedOne', "anti-B0:sigclean", "[isDaughterOfList(Upsilon(4S):DXtag) > 0]", path=path)
+cutAndCopyList('B0:sig_onlyUsedOne', "anti-B0:sigclean", "[isDescendantOfList(Upsilon(4S):DXtag) == 1]", path=path)
 
 
 # these three vars indicate binary if to what category a particle got assigned by semi-inclusive Hc+X tagging
@@ -616,7 +632,7 @@ v.addAlias('basf2_Bsig', 'isDescendantOfList(B0:sig_onlyUsedOne)')
 outvars_FSPs = ['basf2_X','basf2_used','basf2_Bsig']
 #outvars_FSPs = ['isDescendantOfList(B0:sig_onlyUsedOne)']
 #'countInList(X:XonlyUsedOne)','countInList(B0:tag_onlyUsedOne)',
-outvars_FSPs += ['isSignal',
+outvars_FSPs += ['isSignal', 'uniqueParticleIdentifier',
  'mcErrors',
  'mcPDG',
  'genMotherID',
@@ -630,6 +646,20 @@ outvars_FSPs.append("pionID")
 for i in range(10): # dont know yet if that's deep enough, 8 seemed okay at first glance
     tmp_var = "genMotherPDG({})".format(i)
     key = "genMothPDG_{}".format(i)
+    v.addAlias(key,tmp_var)
+    outvars_FSPs.append(key)
+
+
+for i in range(10): # dont know yet if that's deep enough, 8 seemed okay at first glance
+    start = "mcMother("
+    tmp_var = start
+    for j in range(i):
+        tmp_var += start
+    tmp_var += "uniqueParticleIdentifier"
+    for j in range(i+1):
+        tmp_var += ")"   
+    #print(tmp_var)
+    key = "mcMother{}_uniqParID".format(i)
     v.addAlias(key,tmp_var)
     outvars_FSPs.append(key)
 

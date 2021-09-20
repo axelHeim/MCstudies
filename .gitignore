@@ -1,1 +1,5 @@
 /my6modes/plots/*/
+*.pdf
+*.jpg
+*.root
+.ipynb_checkpoints
