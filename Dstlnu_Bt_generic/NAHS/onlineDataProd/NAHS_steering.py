@@ -6,28 +6,52 @@ import basf2
 #like that no need for basf2. before fcts
 from basf2 import *
 from modularAnalysis import *
-from stdPhotons import stdPhotons 
 
 from variables import variables as v
 import vertex as vx
 from stdPhotons import stdPhotons 
-from stdCharged import stdCharged
-from stdPi0s import stdPi0s
+from stdCharged import stdCharged, stdMostLikely
 
 import variables.collections as vc
 import fei
 import sys
 
+
+### define out variables
 sys.path.insert(1, '/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/NAHS/utils')
-from aliases import define_aliases
+from aliases import define_aliases_Hc, define_aliases_FSPs
+
 
 def add_aliases(alias_dict={}):
    for key,value in alias_dict.items():
       v.addAlias(key,value)
 
-AliasDict= define_aliases()
-print(AliasDict)
-add_aliases(AliasDict)
+AliasDictFSPs= define_aliases_FSPs()
+print(AliasDictFSPs)
+add_aliases(AliasDictFSPs)
+outvars_FSPs = list(AliasDictFSPs.keys()) 
+
+
+outvars_FSPs += ['isSignal', 'uniqueParticleIdentifier','mcErrors','mcPDG','genMotherID','genMotherP',
+ 'genMotherPDG','charge','dr','dz','clusterReg','clusterE9E21','M','PDG']
+outvars_FSPs +=  vc.kinematics 
+outvars_FSPs += vc.pid 
+
+
+
+
+
+
+
+AliasDictHc= define_aliases_Hc()
+print(AliasDictHc)
+add_aliases(AliasDictHc)
+Hc_variables = list(AliasDictHc.keys()) 
+Hc_variables +=  vc.kinematics 
+Hc_variables += ['x','y','z']
+
+
+
 
 #import pdg
 #pdg.add_particle("Hc", 9876555, 0, 0, 0, 0)
@@ -69,13 +93,7 @@ applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
 
 ### cut for D*lnu
-           
-applyEventCuts('''[[[abs_genUp4S_PDG_0_0 == 413.0] AND 
-                [[abs_genUp4S_PDG_0_1 == 11.0] OR [abs_genUp4S_PDG_0_1 == 13.0]] AND 
-                [[abs_genUp4S_PDG_0_2 == 12.0] OR [abs_genUp4S_PDG_0_2 == 14.0]]] OR
-                [[abs_genUp4S_PDG_1_0 == 413.0] AND 
-                [[abs_genUp4S_PDG_1_1 == 11.0] OR [abs_genUp4S_PDG_1_1 == 13.0]] AND 
-                [[abs_genUp4S_PDG_1_2 == 12.0] OR [abs_genUp4S_PDG_1_2 == 14.0]]]]''', path)
+applyEventCuts('''[[[abs_genUp4S_PDG_0_0 == 413.0] and [[abs_genUp4S_PDG_0_1 == 11.0] or [abs_genUp4S_PDG_0_1 == 13.0]] and [[abs_genUp4S_PDG_0_2 == 12.0] or [abs_genUp4S_PDG_0_2 == 14.0]]] or [[abs_genUp4S_PDG_1_0 == 413.0] and [[abs_genUp4S_PDG_1_1 == 11.0] or [abs_genUp4S_PDG_1_1 == 13.0]] and [[abs_genUp4S_PDG_1_2 == 12.0] or [abs_genUp4S_PDG_1_2 == 14.0]]]]''', path)
 
 ### FEI part
 particles = fei.get_default_channels(baryonic=True)
@@ -111,37 +129,49 @@ Hc_dict={
 for Hc in all_Hcs:
     path.add_module('MCMatcherParticles', listName=f'{Hc_dict[Hc]}:genericsigProb', looseMCMatching=True)
 
-    applyCuts(f'{Hc_dict[Hc]}:genericsigProb', 'isSignalAcceptMissingGamma == 1', path=path)
+    applyCuts(f'{Hc_dict[Hc]}:genericsigProb', 'isSignalAcceptMissingGamma == 1 and abs(genMotherPDG) == 511.0', path=path)
 
     variablesToNtuple(f'{Hc_dict[Hc]}:genericsigProb',
                     ['extraInfo(SignalProbability)',
                     'isSignalAcceptMissingGamma',
-                    'PDG'],
+                    'PDG'] + Hc_variables,
                     filename=f'{Hc}.root',
                     path=path)
 
 sigProbList = [f'{Hc_dict[Hc]}:genericsigProb' for Hc in all_Hcs]
 
 
-applyEventCuts(f'''[[countInList({sigProbList[0]}) > 0] OR
-                [countInList({sigProbList[1]}) > 0] OR
-                [countInList({sigProbList[2]}) > 0] OR
-                [countInList({sigProbList[3]}) > 0] OR
-                [countInList({sigProbList[4]}) > 0] OR
-                [countInList({sigProbList[5]}) > 0] OR
-                [countInList({sigProbList[6]}) > 0]]''', path)
+# only proceed if one of the lists contains a isSignalAcceptMissingGamma == 1
+applyEventCuts(f'''[[countInList({sigProbList[0]}) > 0] or [countInList({sigProbList[1]}) > 0] or [countInList({sigProbList[2]}) > 0] or [countInList({sigProbList[3]}) > 0] or [countInList({sigProbList[4]}) > 0] or [countInList({sigProbList[5]}) > 0] or [countInList({sigProbList[6]}) > 0]]''', path)
 
 
 
-## cut for D* l nu
-## add alias for sigProb
 ## online cuts
 ## vars in extra file: Hc + FSPs: CM vars , 4mom 
-"[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or [clusterReg == 3 and E > 0.16]]"
+
 """       goodGammaRegion1 = region == 1 && energy > 0.100;
       goodGammaRegion2 = region == 2 && energy > 0.050;
       goodGammaRegion3 = region == 3 && energy > 0.150;
  """
 
+stdMostLikely(path=path)
+#stdCharged('pi','mostlikely', path=path)
+#stdCharged('K','mostlikely', path=path)
+#stdCharged('e','mostlikely', path=path)
+#stdCharged('mu','mostlikely', path=path)
 
-process(path, max_event=500)  
+stdPhotons('all', path=path)
+cutAndCopyList('gamma:goodBelleGamma', 'gamma:all', 
+        "[[clusterReg == 1 and E > 0.100] or [clusterReg == 2 and E > 0.050] or [clusterReg == 3 and E > 0.150]]", 
+        path=path)
+
+variablesToNtuple('pi+:mostlikely', variables=outvars_FSPs, filename="pions.root", path=path)
+variablesToNtuple('K+:mostlikely', variables=outvars_FSPs, filename="kaons.root", path=path)
+variablesToNtuple('e+:mostlikely', variables=outvars_FSPs, filename="electrons.root", path=path)
+variablesToNtuple('mu+:mostlikely', variables=outvars_FSPs, filename="muons.root", path=path)
+variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename="gammas.root", path=path)
+
+
+
+
+process(path, max_event=5000)  
