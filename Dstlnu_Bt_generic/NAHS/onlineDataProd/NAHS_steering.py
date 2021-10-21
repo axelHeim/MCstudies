@@ -16,10 +16,12 @@ import variables.collections as vc
 import fei
 import sys
 
-
+outpath = "/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/NAHS/onlineDataProd/NAHS_100kRun1/"
 ### define out variables
 sys.path.insert(1, '/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/NAHS/utils')
 from aliases import define_aliases_Hc, define_aliases_FSPs
+
+identifier = str(sys.argv[1])
 
 
 def add_aliases(alias_dict={}):
@@ -33,7 +35,7 @@ outvars_FSPs = list(AliasDictFSPs.keys())
 
 
 outvars_FSPs += ['isSignal', 'uniqueParticleIdentifier','mcErrors','mcPDG','genMotherID','genMotherP',
- 'genMotherPDG','charge','dr','dz','clusterReg','clusterE9E21','M','PDG']
+ 'genMotherPDG','charge','dr','dz','clusterReg','clusterE9E21','M','PDG','genParticleID']
 outvars_FSPs +=  vc.kinematics 
 outvars_FSPs += vc.pid 
 
@@ -48,7 +50,7 @@ print(AliasDictHc)
 add_aliases(AliasDictHc)
 Hc_variables = list(AliasDictHc.keys()) 
 Hc_variables +=  vc.kinematics 
-Hc_variables += ['x','y','z']
+Hc_variables += ['x','y','z','uniqueParticleIdentifier','genParticleID']
 
 
 
@@ -135,7 +137,7 @@ for Hc in all_Hcs:
                     ['extraInfo(SignalProbability)',
                     'isSignalAcceptMissingGamma',
                     'PDG'] + Hc_variables,
-                    filename=f'{Hc}.root',
+                    filename=outpath + f'{Hc}_' + identifier + '.root',
                     path=path)
 
 sigProbList = [f'{Hc_dict[Hc]}:genericsigProb' for Hc in all_Hcs]
@@ -165,13 +167,13 @@ cutAndCopyList('gamma:goodBelleGamma', 'gamma:all',
         "[[clusterReg == 1 and E > 0.100] or [clusterReg == 2 and E > 0.050] or [clusterReg == 3 and E > 0.150]]", 
         path=path)
 
-variablesToNtuple('pi+:mostlikely', variables=outvars_FSPs, filename="pions.root", path=path)
-variablesToNtuple('K+:mostlikely', variables=outvars_FSPs, filename="kaons.root", path=path)
-variablesToNtuple('e+:mostlikely', variables=outvars_FSPs, filename="electrons.root", path=path)
-variablesToNtuple('mu+:mostlikely', variables=outvars_FSPs, filename="muons.root", path=path)
-variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename="gammas.root", path=path)
+variablesToNtuple('pi+:mostlikely', variables=outvars_FSPs, filename=outpath + 'pions_' + identifier + '.root', path=path)
+variablesToNtuple('K+:mostlikely', variables=outvars_FSPs, filename=outpath + 'kaons_' + identifier + '.root', path=path)
+variablesToNtuple('e+:mostlikely', variables=outvars_FSPs, filename=outpath + 'electrons_' + identifier + '.root', path=path)
+variablesToNtuple('mu+:mostlikely', variables=outvars_FSPs, filename=outpath + 'muons_' + identifier + '.root', path=path)
+variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename=outpath + 'gammas_' + identifier + '.root', path=path)
 
 
 
 
-process(path, max_event=5000)  
+process(path, max_event=100000)  
