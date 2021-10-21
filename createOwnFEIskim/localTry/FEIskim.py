@@ -12,9 +12,9 @@ from modularAnalysis import *
 
 #import variables.collections as vc
 import fei
-import skim
+#import skim
 
-from glob import glob
+#from glob import glob
 
 from skim.fei import BaseFEISkim 
 
@@ -61,7 +61,7 @@ path = create_path()
 
 inputMdstList('default', [], path)
 
-particles = fei.get_default_channels(baryonic=True)
+#particles = fei.get_default_channels(baryonic=True)
 
 #######important:
 #fei_precuts(path)
@@ -75,11 +75,16 @@ particles = fei.get_default_channels(baryonic=True)
 
 #path.add_path(feistate.path)
 #FEIChannelArgs=particles ,
-myFEI_skim = feiHadronicB0(OutputFileName="ah_skim")
+myFEI_skim = feiHadronicB0(OutputFileName="ah_skim_test")
 
 myFEI_skim(path)
+print("####################################################")
+print("####################################################")
+print("#################### own prints  ###################")
 print(myFEI_skim.SkimLists)
 print(myFEI_skim.fei_precuts)
+print(myFEI_skim.FEIChannelArgs)
 
-
-process(path, max_event=100)  
+print("####################################################")
+print("####################################################")
+process(path, max_event=1)  
