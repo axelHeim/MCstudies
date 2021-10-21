@@ -16,6 +16,18 @@ from stdPi0s import stdPi0s
 
 import variables.collections as vc
 import fei
+import sys
+
+sys.path.insert(1, '/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/NAHS/utils')
+from aliases import define_aliases
+
+def add_aliases(alias_dict={}):
+   for key,value in alias_dict.items():
+      v.addAlias(key,value)
+
+AliasDict= define_aliases()
+print(AliasDict)
+add_aliases(AliasDict)
 
 #import pdg
 #pdg.add_particle("Hc", 9876555, 0, 0, 0, 0)
@@ -56,7 +68,14 @@ buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeForSk
 applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
 
-
+### cut for D*lnu
+           
+applyEventCuts('''[[[abs_genUp4S_PDG_0_0 == 413.0] AND 
+                [abs_genUp4S_PDG_0_1 == 11.0] OR [abs_genUp4S_PDG_0_1 == 13.0] AND 
+                [abs_genUp4S_PDG_0_2 == 12.0] OR [abs_genUp4S_PDG_0_2 == 14.0]] OR
+                [[abs_genUp4S_PDG_1_0 == 413.0] AND 
+                [abs_genUp4S_PDG_1_1 == 11.0] OR [abs_genUp4S_PDG_1_1 == 13.0] AND 
+                [abs_genUp4S_PDG_1_2 == 12.0] OR [abs_genUp4S_PDG_1_2 == 14.0]]]''', path)
 
 ### FEI part
 particles = fei.get_default_channels(baryonic=True)
@@ -87,10 +106,12 @@ Hc_dict={
     "DsDstl" : 'D_s+',
     "JpsiDstl" : 'J/psi'
 }
-for Hc in all_Hcs:
-    rankByHighest(f'{Hc_dict[Hc]}:genericsigProb', 'extraInfo(SignalProbability)', numBest=1,
-              outputVariable='FEIProbabilityRank', path=path)
 
+
+for Hc in all_Hcs:
+    path.add_module('MCMatcherParticles', listName=f'{Hc_dict[Hc]}:genericsigProb', looseMCMatching=True)
+
+    applyCuts(f'{Hc_dict[Hc]}:genericsigProb', 'isSignalAcceptMissingGamma == 1', path=path)
 
     variablesToNtuple(f'{Hc_dict[Hc]}:genericsigProb',
                     ['extraInfo(SignalProbability)',
@@ -99,7 +120,28 @@ for Hc in all_Hcs:
                     filename=f'{Hc}.root',
                     path=path)
 
+sigProbList = [f'{Hc_dict[Hc]}:genericsigProb' for Hc in all_Hcs]
+
+
+applyEventCuts(f'''[[countInList({sigProbList[0]}) > 0] OR
+                [countInList({sigProbList[1]}) > 0] OR
+                [countInList({sigProbList[2]}) > 0] OR
+                [countInList({sigProbList[3]}) > 0] OR
+                [countInList({sigProbList[4]}) > 0] OR
+                [countInList({sigProbList[5]}) > 0] OR
+                [countInList({sigProbList[6]}) > 0]]''', path)
 
 
 
-process(path, max_event=150)  
+## cut for D* l nu
+## add alias for sigProb
+## online cuts
+## vars in extra file: Hc + FSPs: CM vars , 4mom 
+"[[clusterReg == 1 and E > 0.10] or [clusterReg == 2 and E > 0.09] or [clusterReg == 3 and E > 0.16]]"
+"""       goodGammaRegion1 = region == 1 && energy > 0.100;
+      goodGammaRegion2 = region == 2 && energy > 0.050;
+      goodGammaRegion3 = region == 3 && energy > 0.150;
+ """
+
+
+process(path, max_event=500)  
