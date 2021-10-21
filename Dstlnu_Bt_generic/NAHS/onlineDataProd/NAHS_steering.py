@@ -71,11 +71,11 @@ applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 ### cut for D*lnu
            
 applyEventCuts('''[[[abs_genUp4S_PDG_0_0 == 413.0] AND 
-                [abs_genUp4S_PDG_0_1 == 11.0] OR [abs_genUp4S_PDG_0_1 == 13.0] AND 
-                [abs_genUp4S_PDG_0_2 == 12.0] OR [abs_genUp4S_PDG_0_2 == 14.0]] OR
+                [[abs_genUp4S_PDG_0_1 == 11.0] OR [abs_genUp4S_PDG_0_1 == 13.0]] AND 
+                [[abs_genUp4S_PDG_0_2 == 12.0] OR [abs_genUp4S_PDG_0_2 == 14.0]]] OR
                 [[abs_genUp4S_PDG_1_0 == 413.0] AND 
-                [abs_genUp4S_PDG_1_1 == 11.0] OR [abs_genUp4S_PDG_1_1 == 13.0] AND 
-                [abs_genUp4S_PDG_1_2 == 12.0] OR [abs_genUp4S_PDG_1_2 == 14.0]]]''', path)
+                [[abs_genUp4S_PDG_1_1 == 11.0] OR [abs_genUp4S_PDG_1_1 == 13.0]] AND 
+                [[abs_genUp4S_PDG_1_2 == 12.0] OR [abs_genUp4S_PDG_1_2 == 14.0]]]]''', path)
 
 ### FEI part
 particles = fei.get_default_channels(baryonic=True)
