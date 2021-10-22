@@ -42,6 +42,23 @@ def whichBisSig(s):
     return Bsig_genParticleID
 
 
+def whichBisSig_NAHS(s):
+    Bsig_genParticleID = 0
+
+    for i in range(2): # the 2 B's
+        #for j in range(2): # not more than 2 B daughters necessary to check for D*lnu
+        gen_Bdau_Dst_PDG = f'genUp4S_PDG_{i}_0'
+        gen_Bdau_lep_PDG = f'genUp4S_PDG_{i}_1'
+        gen_Bdau_nu_PDG = f'genUp4S_PDG_{i}_2'
+        if ((np.abs(s[gen_Bdau_lep_PDG]) == 13.0) or (np.abs(s[gen_Bdau_lep_PDG]) == 11.0)): # daughter 1 of B is lepton 
+            if ((np.abs(s[gen_Bdau_nu_PDG]) == 14.0) or (np.abs(s[gen_Bdau_nu_PDG]) == 12.0)): # daughter 2 of B is neutrino 
+                if (np.abs(s[gen_Bdau_Dst_PDG]) == 413.0): # daughter 0 of B is D*+ 
+                    Bsig_genParticleID = s[f'genUp4S_uniqParID_{i}']
+                    return Bsig_genParticleID  
+
+    return Bsig_genParticleID
+
+
 def customMCmatching(s):
     customMC = 0
 
@@ -111,3 +128,20 @@ def B_ID(s):
         elif ((s[mcMotheri_uniqParID]) == 83886081.0):
             label = 83886081   
     return label
+
+def ancestor_below_B(s):
+    ancestor=0 # 0: no B ancestor
+    # search for B
+    for i in range(10):
+        genMothPDG_i = "genMothPDG_{}".format(i)
+        # if B is found:
+        if (np.abs(s[genMothPDG_i]) == 511.0):
+            if i == 0:
+                ancestor = -1 # -1: particle is directly below B
+                return ancestor
+            else: # take particle one generation below and return its PDG
+                genMotherID_i = "genMotherID_{}".format(i - 1)
+                ancestor = s[genMotherID_i]
+                return ancestor
+
+    return ancestor
