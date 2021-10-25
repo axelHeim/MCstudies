@@ -3,16 +3,16 @@ def define_aliases_Hc():
     for i in range(0,2): # B level
         alias_dict[f'genUp4S_uniqParID_{i}'] = f'genUpsilon4S(mcDaughter({i}, uniqueParticleIdentifier))'
 
-        for j in range(0,3): # D* l nu level
+        for j in range(0,4): # D* l nu + 1 level
             alias_dict[f'genUp4S_PDG_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},PDG)))'
             alias_dict[f'abs_genUp4S_PDG_{i}_{j}'] = f'abs(genUpsilon4S(mcDaughter({i}, mcDaughter({j},PDG))))'
             alias_dict[f'genUp4S_uniqParID_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},uniqueParticleIdentifier)))'
             if j == 0:
-                for k in range(0,2): # D0 pi level
+                for k in range(0,3): # D0 pi +1 level
                     alias_dict[f'genUp4S_PDG_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},PDG))))'
                     alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},uniqueParticleIdentifier))))'
                     if k == 0: # D0 daughters
-                        for l in range(0,5): 
+                        for l in range(0,6): 
                             alias_dict[f'genUp4S_PDG_{i}_{j}_{k}_{l}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},PDG)))))'
                             alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}_{l}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},uniqueParticleIdentifier)))))'
                 

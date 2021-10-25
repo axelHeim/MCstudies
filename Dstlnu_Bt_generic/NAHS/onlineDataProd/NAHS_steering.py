@@ -16,13 +16,12 @@ import variables.collections as vc
 import fei
 import sys
 
-outpath = "/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/NAHS/onlineDataProd/NAHS_100kRun1/"
+outpath = "/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/NAHS/onlineDataProd/NAHS_allEvts_oneSub/"
 ### define out variables
 sys.path.insert(1, '/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/NAHS/utils')
 from aliases import define_aliases_Hc, define_aliases_FSPs
 
 identifier = str(sys.argv[1])
-
 
 def add_aliases(alias_dict={}):
    for key,value in alias_dict.items():
@@ -50,7 +49,7 @@ print(AliasDictHc)
 add_aliases(AliasDictHc)
 Hc_variables = list(AliasDictHc.keys()) 
 Hc_variables +=  vc.kinematics 
-Hc_variables += ['x','y','z','uniqueParticleIdentifier','genParticleID']
+Hc_variables += ['x','y','z','x_uncertainty','y_uncertainty','z_uncertainty','uniqueParticleIdentifier','genParticleID']
 
 
 
@@ -176,4 +175,4 @@ variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename=outpa
 
 
 
-process(path, max_event=100000)  
+process(path)#, max_event=10)  
