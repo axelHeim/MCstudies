@@ -16,7 +16,7 @@ import variables.collections as vc
 import fei
 import sys
 
-outpath = "/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/NAHS/onlineDataProd/NAHS_allEvts_oneSub/"
+outpath = "/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/NAHS/onlineDataProd/NAHS_allEvts_twoSubs/"
 ### define out variables
 sys.path.insert(1, '/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/NAHS/utils')
 from aliases import define_aliases_Hc, define_aliases_FSPs
