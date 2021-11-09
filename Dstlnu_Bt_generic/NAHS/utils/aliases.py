@@ -15,9 +15,11 @@ def define_aliases_Hc():
                         for l in range(0,6): 
                             alias_dict[f'genUp4S_PDG_{i}_{j}_{k}_{l}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},PDG)))))'
                             alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}_{l}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},uniqueParticleIdentifier)))))'
-                
-    
-    
+                            if l < 3:
+                                for m in range(0,6): 
+                                    alias_dict[f'genUp4S_PDG_{i}_{j}_{k}_{l}_{m}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},mcDaughter({m},PDG))))))'
+                                    alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}_{l}_{m}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},mcDaughter({m},uniqueParticleIdentifier))))))'
+                                
     alias_dict['BeamE'] = 'beamE'
     alias_dict['BeamPx'] = 'beamPx'
     alias_dict['BeamPy'] = 'beamPy'
