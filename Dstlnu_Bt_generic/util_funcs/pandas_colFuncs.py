@@ -145,3 +145,75 @@ def ancestor_below_B(s):
                 return ancestor
 
     return ancestor
+
+
+def D0_decay_type(s):
+    FSPs = [211.,111.,321.]
+    
+    # set which B is B-sig
+    if s['Bsig_uniqParID'] == 83886081.0:
+        i = 0
+    elif s['Bsig_uniqParID'] == 83886082.0:
+        i = 1
+
+    D0_FSP_ancestors = []
+    nonFSPs = []
+    
+    # check each D0 daughter
+    for l in range(0,6): 
+        D0_dau = f'genUp4S_PDG_{i}_0_0_{l}'
+        
+        # skip if nan
+        if (np.isnan(s[D0_dau]) == True):
+            continue
+        
+        D0_dau_absPDG = np.abs(s[D0_dau])
+        
+        # if daughter is gamma, pion, kaon -> save in list
+        if D0_dau_absPDG in FSPs:
+            D0_FSP_ancestors.append(D0_dau_absPDG)
+        else:
+            # not more than 3 (actually 2) intermediates possible because 5 final FSPs is max and each intermediate
+            # must decay into at least 2 particles
+            if l < 3:
+                # if the first daughter of the non FSP does not exist it is not an intermediate
+                if (np.isnan(s[f'genUp4S_PDG_{i}_0_0_{l}_0']) == True):
+                    nonFSPs.append(D0_dau_absPDG)
+                # check up to 6 daus of the intermediate
+                for m in range(0,6): 
+                    D0_grDau = f'genUp4S_PDG_{i}_0_0_{l}_{m}'
+                    if (np.isnan(s[D0_grDau]) == True):
+                        continue
+                    D0_grDau_absPDG = np.abs(s[D0_grDau])
+                    if D0_grDau_absPDG in FSPs:
+                        D0_FSP_ancestors.append(D0_grDau_absPDG)
+                    else:
+                        nonFSPs.append(D0_grDau_absPDG)
+            # as described above only the first 3 (actually 2) can be intermediates
+            else:
+                nonFSPs.append(D0_dau_absPDG)
+                
+    D0_FSP_ancestors.sort(reverse=True)    
+    
+    if len(nonFSPs) == 0:
+        if D0_FSP_ancestors == [321.,211.]:
+            D0_decay = "Kpi"
+        elif D0_FSP_ancestors == [321.,211.,211.,211.]:
+            D0_decay = "Kpipipi"
+        elif D0_FSP_ancestors == [321.,211.,111.]:
+            D0_decay = "Kpipi0"
+        elif D0_FSP_ancestors == [321.,211.,211.,211.,111.]:
+            D0_decay = "Kpipipipi0"
+        else:
+            D0_decay = "notWanted"
+    else:
+        D0_decay = "notWanted" 
+    
+    
+    #print("event:",s["__event__"])            
+    #print("Bsig_uniqParID:",s['Bsig_uniqParID'])            
+    #print("D0_FSP_ancestors:",D0_FSP_ancestors)
+    #print("len(nonFSPs):",len(nonFSPs))
+    #print("D0_decay:",D0_decay)
+    #print('\n')
+    return D0_decay
