@@ -18,7 +18,7 @@ from stdPhotons import stdPhotons
 from variables import variables as v
 import vertex as vx
 from stdPhotons import stdPhotons 
-from stdCharged import stdCharged
+from stdCharged import stdCharged, stdMostLikely
 from stdPi0s import stdPi0s
 
 import variables.collections as vc
@@ -108,7 +108,11 @@ def define_aliases_Xl():
                         for l in range(0,6): 
                             alias_dict[f'genUp4S_PDG_{i}_{j}_{k}_{l}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},PDG)))))'
                             alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}_{l}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},uniqueParticleIdentifier)))))'
-                
+                            if l < 3:
+                                for m in range(0,6): 
+                                    alias_dict[f'genUp4S_PDG_{i}_{j}_{k}_{l}_{m}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},mcDaughter({m},PDG))))))'
+                                    alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}_{l}_{m}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},mcDaughter({m},uniqueParticleIdentifier))))))'
+                                
        
     
     for i in range(0,1):
@@ -480,9 +484,9 @@ rankByHighest('B0:generic', 'extraInfo(SignalProbability)', numBest=1,
 
 # #ROE of B_tag reconstructed by FEI
 
-stdCharged('pi','all', path=path)
-stdCharged('K','all', path=path)
-stdPi0s('eff40_Jan2020', path=path) # equal to loose from Gianna
+#stdCharged('pi','all', path=path)
+#stdCharged('K','all', path=path)
+#stdPi0s('eff40_Jan2020', path=path) # equal to loose from Gianna
 
 # add cut HERE for gammas!!
 """       goodGammaRegion1 = region == 1 && energy > 0.100;
@@ -495,9 +499,9 @@ cutAndCopyList('gamma:goodBelleGamma', 'gamma:myMinimumThresholdList',
         path=path)
 
 
-reconstructDecay('pi0:forX -> gamma:goodBelleGamma gamma:goodBelleGamma','M > 0.124 and M < 0.140', path=path)
+stdMostLikely(path=path)
 
-fillParticleList('K-:forX',"dr < 2 and abs(dz) < 4 and pt > 0.3 and kaonID > 0.6 \
+""" fillParticleList('K-:forX',"dr < 2 and abs(dz) < 4 and pt > 0.3 and kaonID > 0.6 \
 and pionID<0.6 and muonID < 0.9 and electronID < 0.9  and theta > 0.297 and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1", path=path)
 fillParticleList('pi+:forX',"dr < 2 and abs(dz) < 4 and pt > 0.3 and pionID > 0.6 \
 and kaonID < 0.6 and electronID < 0.9 and  muonID < 0.9 and theta > 0.297 and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1", path=path)
@@ -506,11 +510,11 @@ fillParticleList('mu+:candmu', "abs(d0) < 0.5 and abs(dz) < 2 and pt > 0.3 and u
 
 fillParticleList('p+:forX',"dr < 2 and abs(dz) < 4 and pt > 0.3 and protonID > 0.6 and kaonID < 0.6 \
 and pionID<0.6 and muonID < 0.9 and electronID < 0.9  and theta > 0.297 and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1", path=path)
-
+ 
 cutAndCopyList('gamma:forX', 'gamma:goodBelleGamma', "[clusterReg==1 and pt>0.02 and clusterZernikeMVA > 0.35] or [clusterReg==2 and pt>0.03 and clusterZernikeMVA > 0.15] or [clusterReg==3 and pt>0.02 and clusterZernikeMVA > 0.4]", path=path)
+"""
 
-
-roeinputs = ['gamma:forX','pi+:forX','K+:forX','p+:forX', 'e+:cande','mu+:candmu']
+roeinputs = ['gamma:goodBelleGamma','pi+:mostlikely','K+:mostlikely','p+:mostlikely', 'e+:mostlikely','mu+:mostlikely']
 
 # define the mask with hard-coded CS cuts in the ROE mask
 # ROEmask tuple: (mask name, track cuts, cluster cuts)
@@ -528,18 +532,17 @@ for name in names:
 
 
 
-cutAndCopyList('pi+:slow', 'pi+:all', 'abs(d0) < 0.5 and abs(z0) < 2', path=path)
-cutAndCopyList('pi+:sig', 'pi+:all', 'abs(d0) < 0.5 and abs(z0) < 2 and thetaInCDCAcceptance and nCDCHits>0', path=path)
-cutAndCopyList('K+:sig', 'K+:all', 'abs(d0) < 0.5 and abs(z0) < 2 and thetaInCDCAcceptance and nCDCHits>0', path=path)
+cutAndCopyList('pi+:slow', 'pi+:mostlikely', '', path=path)
+cutAndCopyList('pi+:sig', 'pi+:mostlikely', '', path=path)
+cutAndCopyList('K+:sig', 'K+:mostlikely', '', path=path)
 
 # ##Reconstruct Signal side ###
+reconstructDecay('pi0:forD0 -> gamma:goodBelleGamma gamma:goodBelleGamma','M > 0.124 and M < 0.140', path=path)
 
 reconstructDecay('D0:kpi -> K-:sig pi+:sig', '1.8 < M < 1.9', dmID=1001, path=path)
 reconstructDecay('D0:kpipipi -> K-:sig pi+:sig pi-:sig pi+:sig', '1.8 < M < 1.9',dmID=1003, path=path)
-#reconstructDecay('D0:kpipi0 -> K-:sig pi+:sig pi0:loose', '1.8 < M < 1.9', path=path)
-reconstructDecay('D0:kpipi0 -> K-:sig pi+:sig pi0:eff40_Jan2020', '1.8 < M < 1.9',dmID=1002, path=path)
-#reconstructDecay('D0:kpipipipi0 -> K-:sig pi+:sig pi-:sig pi+:sig pi0:loose', '1.8 < M < 1.9', path=path)
-reconstructDecay('D0:kpipipipi0 -> K-:sig pi+:sig pi-:sig pi+:sig pi0:eff40_Jan2020', '1.8 < M < 1.9',dmID=1004, path=path)
+reconstructDecay('D0:kpipi0 -> K-:sig pi+:sig pi0:forD0', '1.8 < M < 1.9',dmID=1002, path=path)
+reconstructDecay('D0:kpipipipi0 -> K-:sig pi+:sig pi-:sig pi+:sig pi0:forD0', '1.8 < M < 1.9',dmID=1004, path=path)
 copyLists('D0:cand', ['D0:kpi','D0:kpipipi','D0:kpipi0','D0:kpipipipi0'], path=path)
 #vx.vertexKFit('D0:cand',0.0, path=path)
 path.add_module('MCMatcherParticles', listName='D0:cand', looseMCMatching=True)
@@ -549,8 +552,8 @@ reconstructDecay('D*+:kpi -> D0:cand pi+:slow', '0.139<massDifference(0)<0.16', 
 
 path.add_module('MCMatcherParticles', listName='D*+:kpi', looseMCMatching=True)
 
-reconstructDecay('anti-B0:Dstkpie -> D*+:kpi e-:cande', '', path=path)
-reconstructDecay('anti-B0:Dstkpimu -> D*+:kpi mu-:candmu', '', path=path)
+reconstructDecay('anti-B0:Dstkpie -> D*+:kpi e-:mostlikely', '', path=path)
+reconstructDecay('anti-B0:Dstkpimu -> D*+:kpi mu-:mostlikely', '', path=path)
 path.add_module('MCMatcherParticles', listName='anti-B0:Dstkpie')
 path.add_module('MCMatcherParticles', listName='anti-B0:Dstkpimu')
 copyLists('anti-B0:sig', ['anti-B0:Dstkpie', 'anti-B0:Dstkpimu'], path=path)
@@ -654,10 +657,10 @@ appendROEMask('Upsilon(4S):DXtag', "CleanROE", "dr < 2 and abs(dz) < 4 and pt > 
 #only proceed with event if a Y(4S) candidate was found 
 applyEventCuts("[countInList(Upsilon(4S):DXtag) > 0]", path)
 # don't proceed if Hc is not isSignal == 1 to get rid of millions of unwanted events
-#applyEventCuts("[countInList(Upsilon(4S):DXtag , daughter(0, daughter(0, isSignalAcceptMissingGamma)) == 1) > 0] ", path)
+applyEventCuts("[countInList(Upsilon(4S):DXtag , daughter(0, daughter(0, isSignalAcceptMissingGamma)) == 1) > 0] ", path)
 
 
-out_path = "/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/BASF2_performance_GiannasScript/"
+out_path = "/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/BASF2_performance_GiannasScript/GiannasScript_wNNcuts_D0fixed/"
 
 variablesToNtuple('Upsilon(4S):DXtag',
                   [
@@ -752,14 +755,12 @@ for name in ["px","py","pz","E"]:
     v.addAlias(key,tmp_var)
     outvars_FSPs.append(key)
 
-copyLists('pi+:out', ['pi+:forX','pi+:sig','pi+:slow'], path=path)
-variablesToNtuple('pi+:out', variables=outvars_FSPs, filename= out_path +  "pions_" + identifier + ".root", path=path)
+variablesToNtuple('pi+:mostlikely', variables=outvars_FSPs, filename= out_path +  "pions_" + identifier + ".root", path=path)
 
-copyLists('K+:out', ['K+:forX','K+:sig'], path=path)
-variablesToNtuple('K+:out', variables=outvars_FSPs, filename= out_path + "kaons_" + identifier + ".root", path=path)
+variablesToNtuple('K+:mostlikely', variables=outvars_FSPs, filename= out_path + "kaons_" + identifier + ".root", path=path)
 
-variablesToNtuple('e+:cande', variables=outvars_FSPs, filename= out_path + "electrons_" + identifier + ".root", path=path)
-variablesToNtuple('mu+:candmu', variables=outvars_FSPs, filename= out_path + "muons_" + identifier + ".root", path=path)
+variablesToNtuple('e+:mostlikely', variables=outvars_FSPs, filename= out_path + "electrons_" + identifier + ".root", path=path)
+variablesToNtuple('mu+:mostlikely', variables=outvars_FSPs, filename= out_path + "muons_" + identifier + ".root", path=path)
 
 outvars_FSPs.append("mcPhotos")
 outvars_FSPs.append("goodBelleGamma")
@@ -767,4 +768,4 @@ variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename= out_
 
 
 
-process(path)#, max_event=10)  
+process(path)#, max_event=100)
