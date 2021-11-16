@@ -28,7 +28,7 @@ def Mbc_Btag(s):
        'Hc_cmpy', 'Hc_cmpz', 'Hc_cmE'
  """
 
-def MM2recoilSignalSide(s):
+def MM2recoilSignalSide(s):  # from Giannas thesis p.24
     variables = ["px","py","pz","E"]
     fourVec_sig = []
     fourVec_tag = []
@@ -42,8 +42,8 @@ def MM2recoilSignalSide(s):
         fourVec_tag[i] += s[f'Hc_cm{var}']
     
     
-    Btag_E = 11.00599957/2.
-    fourVec_tag[3] = -Btag_E
+    sqrt_s = 10.580 # centre-of-mass energy
+    fourVec_tag[3] = -sqrt_s/2
 
     vec=[]
     for k in range(4):
@@ -53,6 +53,8 @@ def MM2recoilSignalSide(s):
     MM2 = (vec[3])**2 - ((vec[0])**2 + (vec[1])**2 + (vec[2])**2)
     
     return MM2
+
+
 
 
 def deltaE(s):
