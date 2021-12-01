@@ -4,13 +4,13 @@ import math
 
 def Mbc_Btag(s):
     
-    fourVec_tag_labX = s["px_summed_X"] + s["Hc_px"]
-    fourVec_tag_labY = s["py_summed_X"] + s["Hc_py"]
-    fourVec_tag_labZ = s["pz_summed_X"] + s["Hc_pz"]
+    fourVec_tag_cmsX = s["CMSpx_summed_X"] + s["Hc_cmPx"]
+    fourVec_tag_cmsY = s["CMSpy_summed_X"] + s["Hc_cmPy"]
+    fourVec_tag_cmsZ = s["CMSpz_summed_X"] + s["Hc_cmPz"]
     
     
     sqrt_s = 10.580 # centre-of-mass energy
-    Mbc = math.sqrt(abs((sqrt_s/2.0)**2 -  ((fourVec_tag_labX)**2 + (fourVec_tag_labY)**2 + (fourVec_tag_labZ)**2)))
+    Mbc = math.sqrt(abs((sqrt_s/2.0)**2 -  ((fourVec_tag_cmsX)**2 + (fourVec_tag_cmsY)**2 + (fourVec_tag_cmsZ)**2)))
         
     
     
