@@ -16,25 +16,30 @@ from stdPhotons import stdPhotons
 import fei
 import sys
 sys.path.insert(1, '/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/NAHS/utils')
-from aliases import define_aliases_Hc, define_aliases_FSPs
+from aliases import define_aliases_Hc, define_aliases_FSPs, define_aliases_Upsilon4S
 
 import pdg
 pdg.add_particle("Hc", 9876555, 0, 0, 0, 0)
-
+pdg.add_particle("X", 9000000, 0, 0, 0, 0)
 
 def add_aliases(alias_dict={}):
    for key,value in alias_dict.items():
       v.addAlias(key,value)
 
 AliasDictHc= define_aliases_Hc()
-#print(AliasDictHc)
 add_aliases(AliasDictHc)
+AliasDictUps4S= define_aliases_Upsilon4S()
+add_aliases(AliasDictUps4S)
 
 from bsm_customModule import bsm_customModule
 
 # Do some basic basf2 stuff
 path = b2.create_path()
-ma.inputMdst("/nfs/dust/belle2/user/axelheim/mixed_generic_MC14ri_a/mdst_000001_prod00016816_task10020000001.root", path=path)
+#ma.inputMdst("/nfs/dust/belle2/user/axelheim/mixed_generic_MC14ri_a/mdst_000001_prod00016816_task10020000001.root", path=path)
+
+input_file = str(sys.argv[2])
+ma.inputMdst(input_file, path=path)
+
 
 ###################
 # event cuts for D*lnu etc and FEI
@@ -191,7 +196,8 @@ AliasDictFSPs= define_aliases_FSPs()
 print(AliasDictFSPs)
 add_aliases(AliasDictFSPs)
 outvars_FSPs = list(AliasDictFSPs.keys()) 
-
+outvars_Ups4S = list(AliasDictUps4S.keys()) 
+AliasDictUps4S
 
 outvars_FSPs += ['isSignal', 'uniqueParticleIdentifier','mcErrors','mcPDG','genMotherID','genMotherP',
  'genMotherPDG','charge','dr','dz','clusterReg','clusterE9E21','M','PDG','genParticleID']
@@ -257,7 +263,7 @@ ma.copyLists('anti-B0:sig', ['anti-B0:Dstkpie', 'anti-B0:Dstkpimu'], path=path)
 
 
 # maybe necessary, check later:
-#cutAndCopyList('anti-B0:sigclean',"anti-B0:sig",'-1.5 < cosThetaBetweenParticleAndNominalB < 1.5 and daughter(0,useCMSFrame(p))<2.4 and daughter(1,useCMSFrame(p))>1.', path= path)
+ma.cutAndCopyList('anti-B0:sigclean',"anti-B0:sig",'-1.5 < cosThetaBetweenParticleAndNominalB < 1.5 and daughter(0,useCMSFrame(p))<2.4 and daughter(1,useCMSFrame(p))>1.', path= path)
 
 #reconstruct a pseudo upsilon4s from B_sig and H_c to determine ROE of this
 ma.reconstructDecay('Upsilon(4S):Dst0Dstl -> anti-B0:sigclean  anti-D*0:genericsigProb','',path=path,allowChargeViolation=True)
@@ -287,6 +293,17 @@ name_dict={
 
 outlists_DX =[]
 
+track_selection=" and ".join(
+            [
+                "[dr < 2]",
+                "[abs(dz) < 4]",
+                "[nCDCHits > 0]",
+                "[thetaInCDCAcceptance==1]"
+            ]
+)
+ecl_selection="[[[clusterReg==1] and [pt>0.02] and [clusterZernikeMVA > 0.35]] or [[clusterReg==2] and [pt>0.03] and [clusterZernikeMVA > 0.15]] or [[clusterReg==3] and [pt>0.02] and [clusterZernikeMVA > 0.4]]]"
+roe_mask = (track_selection, ecl_selection)
+
 for part_BHc_all in parts_BHc_all:
     parid = part_BHc_all[12:]
 
@@ -295,7 +312,7 @@ for part_BHc_all in parts_BHc_all:
 
     ma.applyCuts(part_BHc_all, 'extraInfo(FEIProbabilityRank_all) == 1', path=path)
 
-    ma.cutAndCopyList(f'{name_dict[parid]}:tag',f"{name_dict[parid]}:genericsigProb",f'IsDaughterOf({part_BHc_all}) == 1', path= path)
+    ma.cutAndCopyList(f'{name_dict[parid]}:tag',f"{name_dict[parid]}:genericsigProb",f'isDaughterOfList({part_BHc_all}) == 1', path= path)
 
 
     ma.buildRestOfEvent(part_BHc_all,roeinputs,path=path)
@@ -350,16 +367,24 @@ outvars_FSPs = ['basf2_X','basf2_used','basf2_Bsig']
 
 
 
+#only proceed with event if a Y(4S) candidate was found 
+ma.applyEventCuts("[countInList(Upsilon(4S):DXtag) > 0]", path)
+
+
+
+identifier = str(sys.argv[1])
+outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/firstRun/"
+
 # save Upsilon(4S)
-variablesToNtuple('Upsilon(4S):DXtag',
+ma.variablesToNtuple('Upsilon(4S):DXtag',
                   [
                    "m2RecoilSignalSide",
                    "foxWolframR2_maskedNaN",
                    'foxWolframR2',
 		   'extraInfo(FEIProbabilityRank)',
                    "nTracks"
-                   ]+  tagside_variables,
-                  filename='DXtagDstl.root',
+                   ]+  outvars_Ups4S,
+                  filename=outpath + 'Ups4S_NN_predicted_' + identifier + '.root',
                   path=path)
 
 
@@ -370,17 +395,15 @@ variablesToNtuple('Upsilon(4S):DXtag',
 
 
 # save FSPs
-identifier = str(sys.argv[1])
-outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/basf2_custom_module/Ilias_trial/testOut"
-variablesToNtuple('pi+:mostlikely', variables=outvars_FSPs, filename=outpath + 'pions_' + identifier + '.root', path=path)
-variablesToNtuple('K+:mostlikely', variables=outvars_FSPs, filename=outpath + 'kaons_' + identifier + '.root', path=path)
-variablesToNtuple('e+:mostlikely', variables=outvars_FSPs, filename=outpath + 'electrons_' + identifier + '.root', path=path)
-variablesToNtuple('mu+:mostlikely', variables=outvars_FSPs, filename=outpath + 'muons_' + identifier + '.root', path=path)
-variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename=outpath + 'gammas_' + identifier + '.root', path=path)
+ma.variablesToNtuple('pi+:mostlikely', variables=outvars_FSPs, filename=outpath + 'pions_' + identifier + '.root', path=path)
+ma.variablesToNtuple('K+:mostlikely', variables=outvars_FSPs, filename=outpath + 'kaons_' + identifier + '.root', path=path)
+ma.variablesToNtuple('e+:mostlikely', variables=outvars_FSPs, filename=outpath + 'electrons_' + identifier + '.root', path=path)
+ma.variablesToNtuple('mu+:mostlikely', variables=outvars_FSPs, filename=outpath + 'muons_' + identifier + '.root', path=path)
+ma.variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename=outpath + 'gammas_' + identifier + '.root', path=path)
 
 
 
-b2.process(path, max_event=1000)
+b2.process(path)#, max_event=20)
 
 
 print("**************")
