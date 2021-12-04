@@ -48,7 +48,7 @@ class bsm_customModule(b2.Module):
 
     def event(self):
         ''' Run every event '''
-        #print("start of event")
+        print("\n start of event")
         
         
 
@@ -79,30 +79,16 @@ class bsm_customModule(b2.Module):
                 # Get the B parent index, set to -1 if particle has no MC match
                 #particle.addExtraInfo("NN_prediction", 25) 	
                 
+                Hc_used = particle.getExtraInfo("Hc_used")
                 
+                if Hc_used == 1.0:
+                    continue
+                #print("Hc_used:",Hc_used)
                 readOut_features = [vm.evaluate(f, particle) for f in self.features]
                 tmp_par_vars.append(readOut_features)
                 
                 
-                """     for feature in self.features:
-                    print("feature:",feature)
-                    
-                    
-                    if feature in ["px","py","pz","E","M","charge","dr","dz","clusterReg","clusterE9E21","pionID","kaonID","electronID","muonID","protonID","x","y","z"]:
-                        funcName=feature    
-                        tmp_par_vars.append(varFuncDict[funcName](particle)) 
-                        
-                        print("funcName:",funcName)
-                        print("tmp_par_vars[-1]:",tmp_par_vars[-1])
-                    else:
-                        funcName="extraInfo"    
-                        tmp_par_vars.append(varFuncDict[funcName](particle,feature)) 
-                        
-                        print("funcName:",funcName)
-                        print("tmp_par_vars[-1]:",tmp_par_vars[-1])
-                        
-                    
-                    print(" \n ") """
+             
                     
                 #print("readOut_features:",readOut_features)
                 
@@ -138,7 +124,15 @@ class bsm_customModule(b2.Module):
             p_list = Belle2.PyStoreObj(p_list_name)            
 
             for particle in p_list.obj():
+                Hc_used = particle.getExtraInfo("Hc_used")
+                if Hc_used == 1.0:
+                    continue
+                #print("Hc_used at addExtraInfo:",Hc_used)
+                
+                
                 particle.addExtraInfo("NN_prediction", winners[0,particle_i].item()) 
+                
+                
                 #print("winners[0,particle_i]:", winners[0,particle_i].item())
 
                 particle_i += 1

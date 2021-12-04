@@ -2,10 +2,16 @@
 Steering file to run only the FEI and check if event is B->D*lnu
 and subsequently save all FSPs
  """
-import basf2
+from NN_custom_module import BranchSeparatorModule
+ 
+#import basf2
 #like that no need for basf2. before fcts
 from basf2 import *
 from modularAnalysis import *
+
+import basf2 as b2
+
+import modularAnalysis as ma
 
 from variables import variables as v
 import vertex as vx
@@ -16,7 +22,7 @@ import variables.collections as vc
 import fei
 import sys
 
-from NN_custom_module import BranchSeparatorModule
+
 
 outpath = "/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/basf2_custom_module/test_output/"
 ### define out variables
@@ -59,8 +65,8 @@ Hc_variables += ['x','y','z','x_uncertainty','y_uncertainty','z_uncertainty','un
 #import pdg
 #pdg.add_particle("Hc", 9876555, 0, 0, 0, 0)
 
-path = create_path()
-inputMdstList('default', [], path)
+path = ma.create_path()
+inputMdstList([], path)
 
 
 v.addAlias('foxWolframR2_maskedNaN', 'ifNANgiveX(foxWolframR2,1)')
@@ -102,7 +108,7 @@ applyEventCuts('''[[[abs_genUp4S_PDG_0_0 == 413.0] and [[abs_genUp4S_PDG_0_1 == 
 particles = fei.get_default_channels(baryonic=True)
 
 
-conditions.prepend_globaltag(getAnalysisGlobaltag()) # needed for FEI prefix  FEIv4_2021_MC14_release_05_01_12  ;from: https://questions.belle2.org/question/11130/b2bii-global-tag-error-in-release-05-02-06/
+b2.conditions.prepend_globaltag(getAnalysisGlobaltag()) # needed for FEI prefix  FEIv4_2021_MC14_release_05_01_12  ;from: https://questions.belle2.org/question/11130/b2bii-global-tag-error-in-release-05-02-06/
 configuration = fei.config.FeiConfiguration(prefix='FEIv4_2021_MC14_release_05_01_12', training=False, monitor=False)
 feistate = fei.get_path(particles, configuration)
 

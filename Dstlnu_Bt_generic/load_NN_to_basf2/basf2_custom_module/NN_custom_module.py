@@ -1,3 +1,8 @@
+import sys
+#sys.path.insert(1, '/afs/desy.de/user/a/axelheim/private/baumbauen/notebooks/')
+sys.path.append('/afs/desy.de/user/a/axelheim/private/baumbauen/notebooks/')
+#from BranchSeparatorModel import BranchSeparatorModel
+
 import basf2 as b2
 from ROOT import Belle2
 from variables import variables as vm
@@ -6,9 +11,7 @@ import numpy as np
 import torch 
 
 
-import sys
-sys.path.insert(1, '/afs/desy.de/user/a/axelheim/private/baumbauen/notebooks/')
-from BranchSeparatorModel import BranchSeparatorModel
+
 
 class BranchSeparatorModule(b2.Module):
     ''' Save given features of given particles lists '''
@@ -49,22 +52,9 @@ class BranchSeparatorModule(b2.Module):
         specs = self.specs_output_label.split("_")
   
         print("num_classes:",self.num_classes)
-        # load the model from checkpoint
-        """ 
-        self.model = BranchSeparatorModel(infeatures=len(self.features),
-            dim_feedforward=int(specs[0]),
-            num_classes=num_classes,
-            dropout=float(specs[3]),
-            nblocks=int(specs[4]))
-
-
-        checkpoint = torch.load(model_dir / checkpoint_name)
-        self.model.load_state_dict(checkpoint)
-
-        self.model.eval()
-         """
+        self.model = torch.jit.load("scripted_models/BranchSeparatorModel_jit.pt")
         
-        
+        print("self.model:",self.model)
 
 
 
@@ -96,10 +86,10 @@ class BranchSeparatorModule(b2.Module):
                 
                 #print("particle.getInfo():",particle.getInfo())
 
-                
+                #tensor = torch.Tensor([5,6,7])
                 
                 # Get the B parent index, set to -1 if particle has no MC match
-                #particle.addExtraInfo("NN_prediction", 25) 	
+                particle.addExtraInfo("NN_prediction", 25) 	
                 
                 
                 readOut_features = [vm.evaluate(f, particle) for f in self.features]
@@ -135,6 +125,8 @@ class BranchSeparatorModule(b2.Module):
         # impute the nan values with -1. (check if that's logical for all values if input vars get changed)
         NN_input_features= np.nan_to_num(NN_input_features, copy=False, nan=-1.0)
         
+        shape = NN_input_features.shape
+        NN_input_features = NN_input_features.reshape(shape[0], 1, shape[1])
         """ 
         SA_pred = self.model(NN_input_features)
 
@@ -154,7 +146,7 @@ class BranchSeparatorModule(b2.Module):
                 
         """
         #print("NN_input_features.shape:",NN_input_features.shape)
-        #print("NN_input_features:",NN_input_features)
+        #print(repr(NN_input_features))
                     
                 
                            
@@ -168,9 +160,27 @@ class BranchSeparatorModule(b2.Module):
     def terminate(self):
         pass
         # delete network etc here
-        
-        
-        
+
+
+""" fsp_particleLists = ['pi+:mostlikely','K+:mostlikely','e+:mostlikely','mu+:mostlikely','gamma:goodBelleGamma']
+
+#allParticleLists=Hc_particleLists+FSP_particleLists
+
+nn_vars = ["px","py","pz","E","M","charge","dr","dz","clusterReg","clusterE9E21","pionID","kaonID","electronID","muonID","protonID",
+     "x","y","z"] 
+ 
+branch_separator_module = BranchSeparatorModule(
+    particle_lists=fsp_particleLists,
+    features=nn_vars,
+    model_dir="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/saved_models/NAHSA_Gmodes_fixedD0modes/NAHS_allEvts_twoSubs_fixedD0run/NAHSA_allExtras/256_0_64_0.1_4",
+    checkpoint_name = "model_checkpoint_model_perfectSA=0.7651.pt",
+    specs_output_label = "256_0_64_0.1_4",
+    num_classes = 3    
+)       
+   
+   
+print(branch_separator_module)     
+         """
 """         
         def px(particle):
             return particle.getPx()
