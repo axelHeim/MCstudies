@@ -235,12 +235,20 @@ ma.cutAndCopyList('mu+:pred_Bsig', 'mu+:mostlikely', "[NN_prediction == 2]", pat
 
 ## reconstruct Y(4S) based on NN prediction
 # reconstruct D0
-ma.reconstructDecay('pi0:forD0 -> gamma:pred_Bsig gamma:pred_Bsig','M > 0.124 and M < 0.140', path=path)
+#ma.reconstructDecay('pi0:forD0 -> gamma:pred_Bsig gamma:pred_Bsig','M > 0.124 and M < 0.140', path=path)
+ma.reconstructDecay('pi0:forD0 -> gamma:pred_Bsig gamma:pred_Bsig','', path=path)
 
-ma.reconstructDecay('D0:kpi -> K-:pred_Bsig pi+:pred_Bsig', '1.8 < M < 1.9', path=path)
-ma.reconstructDecay('D0:kpipipi -> K-:pred_Bsig pi+:pred_Bsig pi-:pred_Bsig pi+:pred_Bsig', '1.8 < M < 1.9', path=path)
-ma.reconstructDecay('D0:kpipi0 -> K-:pred_Bsig pi+:pred_Bsig pi0:forD0', '1.8 < M < 1.9', path=path)
-ma.reconstructDecay('D0:kpipipipi0 -> K-:pred_Bsig pi+:pred_Bsig pi-:pred_Bsig pi+:pred_Bsig pi0:forD0', '1.8 < M < 1.9', path=path)
+#ma.reconstructDecay('D0:kpi -> K-:pred_Bsig pi+:pred_Bsig', '1.8 < M < 1.9', path=path)
+ma.reconstructDecay('D0:kpi -> K-:pred_Bsig pi+:pred_Bsig', '', path=path)
+
+#ma.reconstructDecay('D0:kpipipi -> K-:pred_Bsig pi+:pred_Bsig pi-:pred_Bsig pi+:pred_Bsig', '1.8 < M < 1.9', path=path)
+ma.reconstructDecay('D0:kpipipi -> K-:pred_Bsig pi+:pred_Bsig pi-:pred_Bsig pi+:pred_Bsig', '', path=path)
+
+#ma.reconstructDecay('D0:kpipi0 -> K-:pred_Bsig pi+:pred_Bsig pi0:forD0', '1.8 < M < 1.9', path=path)
+ma.reconstructDecay('D0:kpipi0 -> K-:pred_Bsig pi+:pred_Bsig pi0:forD0', '', path=path)
+
+#ma.reconstructDecay('D0:kpipipipi0 -> K-:pred_Bsig pi+:pred_Bsig pi-:pred_Bsig pi+:pred_Bsig pi0:forD0', '1.8 < M < 1.9', path=path)
+ma.reconstructDecay('D0:kpipipipi0 -> K-:pred_Bsig pi+:pred_Bsig pi-:pred_Bsig pi+:pred_Bsig pi0:forD0', '', path=path)
 ma.copyLists('D0:cand', ['D0:kpi','D0:kpipipi','D0:kpipi0','D0:kpipipipi0'], path=path)
 path.add_module('MCMatcherParticles', listName='D0:cand', looseMCMatching=True)
 
@@ -250,7 +258,8 @@ roeinputs = ['gamma:pred_X','pi+:pred_X','K+:pred_X','p+:pred_X', 'e+:pred_X','m
 
 
 # reconstruct D*+
-ma.reconstructDecay('D*+:kpi -> D0:cand pi+:pred_Bsig', '0.139<massDifference(0)<0.16', path=path)
+#ma.reconstructDecay('D*+:kpi -> D0:cand pi+:pred_Bsig', '0.139<massDifference(0)<0.16', path=path)
+ma.reconstructDecay('D*+:kpi -> D0:cand pi+:pred_Bsig', '', path=path)
 path.add_module('MCMatcherParticles', listName='D*+:kpi', looseMCMatching=True)
 
 
@@ -263,7 +272,7 @@ ma.copyLists('anti-B0:sig', ['anti-B0:Dstkpie', 'anti-B0:Dstkpimu'], path=path)
 
 
 # maybe necessary, check later:
-ma.cutAndCopyList('anti-B0:sigclean',"anti-B0:sig",'-1.5 < cosThetaBetweenParticleAndNominalB < 1.5 and daughter(0,useCMSFrame(p))<2.4 and daughter(1,useCMSFrame(p))>1.', path= path)
+#ma.cutAndCopyList('anti-B0:sigclean',"anti-B0:sig",'-1.5 < cosThetaBetweenParticleAndNominalB < 1.5 and daughter(0,useCMSFrame(p))<2.4 and daughter(1,useCMSFrame(p))>1.', path= path)
 
 #reconstruct a pseudo upsilon4s from B_sig and H_c to determine ROE of this
 """ ma.reconstructDecay('Upsilon(4S):Dst0Dstl -> anti-B0:sigclean  anti-D*0:genericsigProb','',path=path,allowChargeViolation=True)
@@ -315,8 +324,8 @@ for part_BHc_all in parts_BHc_all:
     
     
     ma.reconstructDecay(f'B0:{parid}DXtag -> {name_dict[parid]}:genericsigProb X:all','',path=path,allowChargeViolation=True)
-    ma.reconstructDecay(f'Upsilon(4S):{parid}DXtag -> B0:{parid}DXtag anti-B0:sigclean','',path=path)
-    ma.applyCuts(f'Upsilon(4S):{parid}DXtag', 'abs(daughter(0,deltaE))<0.2', path=path)
+    ma.reconstructDecay(f'Upsilon(4S):{parid}DXtag -> B0:{parid}DXtag anti-B0:sig','',path=path)
+    #ma.applyCuts(f'Upsilon(4S):{parid}DXtag', 'abs(daughter(0,deltaE))<0.2', path=path)
     outlists_DX.append(f'Upsilon(4S):{parid}DXtag')
 
 
@@ -346,7 +355,7 @@ ma.cutAndCopyLists('B0:tag_onlyUsedOne', BtagAll, "[isDescendantOfList(Upsilon(4
 # cannot combine all Hc's because they are different particles, sigh :/
 #cutAndCopyLists('X:HcOnlyUsedOne', HcAll, "[isDaughterOfList(B0:tag_onlyUsedOne) > 0]", path=path)
 
-ma.cutAndCopyList('B0:sig_onlyUsedOne', "anti-B0:sigclean", "[isDescendantOfList(Upsilon(4S):DXtag) == 1]", path=path)
+ma.cutAndCopyList('B0:sig_onlyUsedOne', "anti-B0:sig", "[isDescendantOfList(Upsilon(4S):DXtag) == 1]", path=path)
 
 
 # these three vars indicate binary if to what category a particle got assigned by semi-inclusive Hc+X tagging
