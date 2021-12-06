@@ -266,14 +266,14 @@ ma.copyLists('anti-B0:sig', ['anti-B0:Dstkpie', 'anti-B0:Dstkpimu'], path=path)
 ma.cutAndCopyList('anti-B0:sigclean',"anti-B0:sig",'-1.5 < cosThetaBetweenParticleAndNominalB < 1.5 and daughter(0,useCMSFrame(p))<2.4 and daughter(1,useCMSFrame(p))>1.', path= path)
 
 #reconstruct a pseudo upsilon4s from B_sig and H_c to determine ROE of this
-ma.reconstructDecay('Upsilon(4S):Dst0Dstl -> anti-B0:sigclean  anti-D*0:genericsigProb','',path=path,allowChargeViolation=True)
+""" ma.reconstructDecay('Upsilon(4S):Dst0Dstl -> anti-B0:sigclean  anti-D*0:genericsigProb','',path=path,allowChargeViolation=True)
 ma.reconstructDecay('Upsilon(4S):DstpDstl -> anti-B0:sigclean  D*-:genericsigProb','',path=path,allowChargeViolation=True)
 ma.reconstructDecay('Upsilon(4S):DpDstl -> anti-B0:sigclean  D-:genericsigProb','',path=path,allowChargeViolation=True)
 ma.reconstructDecay('Upsilon(4S):D0Dstl -> anti-B0:sigclean  anti-D0:genericsigProb','',path=path,allowChargeViolation=True)
 ma.reconstructDecay('Upsilon(4S):LcDstl -> anti-B0:sigclean  anti-Lambda_c-:genericsigProb','',path=path,allowChargeViolation=True)
 ma.reconstructDecay('Upsilon(4S):DsDstl -> anti-B0:sigclean  D_s+:genericsigProb','',path=path,allowChargeViolation=True)
 ma.reconstructDecay('Upsilon(4S):JpsiDstl -> anti-B0:sigclean  J/psi:genericsigProb','',path=path,allowChargeViolation=True)
-
+ """
 parts_BHc_all=['Upsilon(4S):DpDstl', 'Upsilon(4S):LcDstl' ,'Upsilon(4S):DsDstl', 'Upsilon(4S):DstpDstl', 'Upsilon(4S):D0Dstl', 
                 'Upsilon(4S):JpsiDstl', 'Upsilon(4S):Dst0Dstl']
 
@@ -293,34 +293,28 @@ name_dict={
 
 outlists_DX =[]
 
-track_selection=" and ".join(
-            [
-                "[dr < 2]",
-                "[abs(dz) < 4]",
-                "[nCDCHits > 0]",
-                "[thetaInCDCAcceptance==1]"
-            ]
-)
-ecl_selection="[[[clusterReg==1] and [pt>0.02] and [clusterZernikeMVA > 0.35]] or [[clusterReg==2] and [pt>0.03] and [clusterZernikeMVA > 0.15]] or [[clusterReg==3] and [pt>0.02] and [clusterZernikeMVA > 0.4]]]"
-roe_mask = (track_selection, ecl_selection)
+
+X_lists = ["K+:pred_X","pi+:pred_X","mu+:pred_X","e+:pred_X","gamma:pred_X"]
+ma.combineAllParticles(X_lists, "X:all", cut='', path=path)
 
 for part_BHc_all in parts_BHc_all:
     parid = part_BHc_all[12:]
 
+    """  
     ma.rankByHighest(part_BHc_all, 'daughter(1,extraInfo(SignalProbability))', numBest=0, allowMultiRank=True,
             outputVariable='FEIProbabilityRank_all', path=path)
 
     ma.applyCuts(part_BHc_all, 'extraInfo(FEIProbabilityRank_all) == 1', path=path)
 
     ma.cutAndCopyList(f'{name_dict[parid]}:tag',f"{name_dict[parid]}:genericsigProb",f'isDaughterOfList({part_BHc_all}) == 1', path= path)
-
-
     ma.buildRestOfEvent(part_BHc_all,roeinputs,path=path)
     ma.appendROEMask(part_BHc_all, 'CleanROEBtag', roe_mask[0], roe_mask[1], path=path)
     ##construct X from ROE
     ma.fillParticleListFromROE(f'X:tag{parid}','',maskName="CleanROEBtag",sourceParticleListName=part_BHc_all ,path=path)
-    ##reconstruct B_tag from X and H_c
-    ma.reconstructDecay(f'B0:{parid}DXtag -> {name_dict[parid]}:tag X:tag{parid}','',path=path,allowChargeViolation=True)
+    """ ##reconstruct B_tag from X and H_c
+    
+    
+    ma.reconstructDecay(f'B0:{parid}DXtag -> {name_dict[parid]}:genericsigProb X:all','',path=path,allowChargeViolation=True)
     ma.reconstructDecay(f'Upsilon(4S):{parid}DXtag -> B0:{parid}DXtag anti-B0:sigclean','',path=path)
     ma.applyCuts(f'Upsilon(4S):{parid}DXtag', 'abs(daughter(0,deltaE))<0.2', path=path)
     outlists_DX.append(f'Upsilon(4S):{parid}DXtag')
@@ -328,8 +322,8 @@ for part_BHc_all in parts_BHc_all:
 
 ma.copyLists('Upsilon(4S):DXtag', outlists_DX, path=path)
 
-ma.rankByHighest('Upsilon(4S):DXtag', 'daughter(0,daughter(0, extraInfo(SignalProbability)))', numBest=1,
-              outputVariable='FEIProbabilityRank', path=path)
+""" ma.rankByHighest('Upsilon(4S):DXtag', 'daughter(0,daughter(0, extraInfo(SignalProbability)))', numBest=1,
+              outputVariable='FEIProbabilityRank', path=path) """
 
 path.add_module('MCMatcherParticles', listName='Upsilon(4S):DXtag', looseMCMatching=True)
 
@@ -343,12 +337,12 @@ BtagAll = []
 for part_BHc_all in parts_BHc_all:
     parid = part_BHc_all[12:]
     HcAll.append(f'{name_dict[parid]}:tag')
-    X_All.append(f'X:tag{parid}')
+    #X_All.append(f'X:tag{parid}')
     BtagAll.append(f'B0:{parid}DXtag')
 
 
 ma.cutAndCopyLists('B0:tag_onlyUsedOne', BtagAll, "[isDescendantOfList(Upsilon(4S):DXtag) == 1]", path=path)
-ma.cutAndCopyLists('X:XonlyUsedOne', X_All, "[isDescendantOfList(B0:tag_onlyUsedOne) == 1]", path=path)
+#ma.cutAndCopyLists('X:XonlyUsedOne', X_All, "[isDescendantOfList(B0:tag_onlyUsedOne) == 1]", path=path)
 # cannot combine all Hc's because they are different particles, sigh :/
 #cutAndCopyLists('X:HcOnlyUsedOne', HcAll, "[isDaughterOfList(B0:tag_onlyUsedOne) > 0]", path=path)
 
@@ -356,13 +350,12 @@ ma.cutAndCopyList('B0:sig_onlyUsedOne', "anti-B0:sigclean", "[isDescendantOfList
 
 
 # these three vars indicate binary if to what category a particle got assigned by semi-inclusive Hc+X tagging
-v.addAlias('basf2_X', 'isDescendantOfList(X:XonlyUsedOne)')
 #v.addAlias('YYY', 'isDescendantOfList("pi0:forX")')
 v.addAlias('basf2_used', 'isDescendantOfList(Upsilon(4S):DXtag)')
 v.addAlias('basf2_Bsig', 'isDescendantOfList(B0:sig_onlyUsedOne)')
 
 
-outvars_FSPs = ['basf2_X','basf2_used','basf2_Bsig']
+outvars_FSPs = ['basf2_used','basf2_Bsig']
 
 
 
@@ -373,7 +366,9 @@ ma.applyEventCuts("[countInList(Upsilon(4S):DXtag) > 0]", path)
 
 
 identifier = str(sys.argv[1])
-outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/firstRun/"
+outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/secondRun/"
+#outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
+
 
 # save Upsilon(4S)
 ma.variablesToNtuple('Upsilon(4S):DXtag',
@@ -403,7 +398,7 @@ ma.variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename=ou
 
 
 
-b2.process(path)#, max_event=20)
+b2.process(path)#, max_event=20000)
 
 
 print("**************")
