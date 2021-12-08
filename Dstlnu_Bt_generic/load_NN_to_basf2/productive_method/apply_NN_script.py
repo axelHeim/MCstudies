@@ -340,7 +340,6 @@ ma.appendROEMask('Upsilon(4S):DXtag', 'my_mask_gammas', '', '', path=path)
 v.addAlias('roeE_ofUps4S', 'roeE(my_mask_gammas)')
 outvars_Ups4S.append("roeE_ofUps4S")
 
-x
 
 v.addAlias('E_predicted_bg_gammas', 'totalEnergyOfParticlesInList(gamma:pred_bg)')
 outvars_Ups4S.append("E_predicted_bg_gammas")
