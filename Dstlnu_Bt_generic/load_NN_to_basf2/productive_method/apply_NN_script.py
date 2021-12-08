@@ -197,7 +197,6 @@ print(AliasDictFSPs)
 add_aliases(AliasDictFSPs)
 outvars_FSPs = list(AliasDictFSPs.keys()) 
 outvars_Ups4S = list(AliasDictUps4S.keys()) 
-AliasDictUps4S
 
 outvars_FSPs += ['isSignal', 'uniqueParticleIdentifier','mcErrors','mcPDG','genMotherID','genMotherP',
  'genMotherPDG','charge','dr','dz','clusterReg','clusterE9E21','M','PDG','genParticleID']
@@ -309,21 +308,12 @@ ma.combineAllParticles(X_lists, "X:all", cut='', path=path)
 for part_BHc_all in parts_BHc_all:
     parid = part_BHc_all[12:]
 
-    """  
-    ma.rankByHighest(part_BHc_all, 'daughter(1,extraInfo(SignalProbability))', numBest=0, allowMultiRank=True,
-            outputVariable='FEIProbabilityRank_all', path=path)
-
-    ma.applyCuts(part_BHc_all, 'extraInfo(FEIProbabilityRank_all) == 1', path=path)
-
-    ma.cutAndCopyList(f'{name_dict[parid]}:tag',f"{name_dict[parid]}:genericsigProb",f'isDaughterOfList({part_BHc_all}) == 1', path= path)
-    ma.buildRestOfEvent(part_BHc_all,roeinputs,path=path)
-    ma.appendROEMask(part_BHc_all, 'CleanROEBtag', roe_mask[0], roe_mask[1], path=path)
-    ##construct X from ROE
-    ma.fillParticleListFromROE(f'X:tag{parid}','',maskName="CleanROEBtag",sourceParticleListName=part_BHc_all ,path=path)
-    """ ##reconstruct B_tag from X and H_c
-    
+ 
+    ##reconstruct B_tag from X and H_c   
     
     ma.reconstructDecay(f'B0:{parid}DXtag -> {name_dict[parid]}:genericsigProb X:all','',path=path,allowChargeViolation=True)
+    path.add_module('MCMatcherParticles', listName=f'B0:{parid}DXtag')
+    
     ma.reconstructDecay(f'Upsilon(4S):{parid}DXtag -> B0:{parid}DXtag anti-B0:sig','',path=path)
     #ma.applyCuts(f'Upsilon(4S):{parid}DXtag', 'abs(daughter(0,deltaE))<0.2', path=path)
     outlists_DX.append(f'Upsilon(4S):{parid}DXtag')
@@ -337,6 +327,38 @@ ma.copyLists('Upsilon(4S):DXtag', outlists_DX, path=path)
 path.add_module('MCMatcherParticles', listName='Upsilon(4S):DXtag', looseMCMatching=True)
 
 
+#only proceed with event if a Y(4S) candidate was found 
+ma.applyEventCuts("[countInList(Upsilon(4S):DXtag) > 0]", path)
+
+
+# construct the E_extra of unused gammas in the event
+#goodBelleGammas = "[[clusterReg == 1 and E > 0.100] or [clusterReg == 2 and E > 0.050] or [clusterReg == 3 and E > 0.150]]"
+ma.buildRestOfEvent('Upsilon(4S):DXtag', inputParticlelists='gamma:goodBelleGamma', path=path)
+ma.appendROEMask('Upsilon(4S):DXtag', 'my_mask_gammas', '', '', path=path)
+#ma.printROEInfo(mask_names=['my_mask_gammas'], full_print=True, path=path)
+
+v.addAlias('roeE_ofUps4S', 'roeE(my_mask_gammas)')
+outvars_Ups4S.append("roeE_ofUps4S")
+
+x
+
+v.addAlias('E_predicted_bg_gammas', 'totalEnergyOfParticlesInList(gamma:pred_bg)')
+outvars_Ups4S.append("E_predicted_bg_gammas")
+
+
+
+#v.addAlias('Eextra_ROEofUps4S', 'roeEextra(goodROEGamma)')
+#outvars_Ups4S.append("Eextra_ROEofUps4S")
+
+
+""" 
+# second way to construct the E_extra of unused gammas in the event, probably wrong
+ma.cutAndCopyList('gamma:notUsed', 'gamma:goodBelleGamma', 
+        "[isDescendantOfList(Upsilon(4S):DXtag) == 0]", 
+        path=path)
+v.addAlias('Eextra_goodBelleGamma', 'totalEnergyOfParticlesInList(gamma:notUsed)')
+outvars_Ups4S.append("Eextra_goodBelleGamma")
+ """
 
 ### create and cut lists to only contain the finally used Hc,X,Bsig in order to label to the FSPs with them
 
@@ -364,18 +386,16 @@ v.addAlias('basf2_used', 'isDescendantOfList(Upsilon(4S):DXtag)')
 v.addAlias('basf2_Bsig', 'isDescendantOfList(B0:sig_onlyUsedOne)')
 
 
-outvars_FSPs = ['basf2_used','basf2_Bsig']
+outvars_FSPs += ['basf2_used','basf2_Bsig']
 
 
 
 
-#only proceed with event if a Y(4S) candidate was found 
-ma.applyEventCuts("[countInList(Upsilon(4S):DXtag) > 0]", path)
 
 
 
 identifier = str(sys.argv[1])
-outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/secondRun/"
+outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/thirdRun/"
 #outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
 
 

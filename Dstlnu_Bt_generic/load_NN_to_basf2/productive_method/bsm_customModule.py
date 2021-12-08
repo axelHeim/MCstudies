@@ -38,7 +38,7 @@ class bsm_customModule(b2.Module):
     def initialize(self):
         print("features:",self.features)
         print("initialize func")
-        
+        self.eventinfo = Belle2.PyStoreObj('EventMetaData')
 
         
 
@@ -49,7 +49,8 @@ class bsm_customModule(b2.Module):
     def event(self):
         ''' Run every event '''
         print("\n start of event")
-        
+        evt_num = self.eventinfo.getEvent()
+        print("evt_num:", evt_num)
         
 
         
@@ -117,7 +118,7 @@ class bsm_customModule(b2.Module):
         num_particles = NN_input_features.shape[0]
         particle_i=0
         
-        #print("winners.shape:",winners.shape)
+        print("winners.shape:",winners.shape)
         
         for p_list_name in self.particle_lists:
             # Get the particle list (note this is a regular Particle list, not MCParticle)
@@ -136,11 +137,8 @@ class bsm_customModule(b2.Module):
                 #print("winners[0,particle_i]:", winners[0,particle_i].item())
 
                 particle_i += 1
-                
-        
-        #print("NN_input_features.shape:",NN_input_features.shape)
-        #print(repr(NN_input_features))
-                    
+        print("end of event")
+          
                 
                            
                            

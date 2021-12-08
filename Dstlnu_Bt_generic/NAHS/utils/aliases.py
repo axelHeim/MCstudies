@@ -11,8 +11,8 @@ def define_aliases_Upsilon4S():
     
     
     
-    alias_dict['Up4S_isSig'] = 'isSignal'
-    alias_dict['Up4S_isSignalMissingNeutrino'] = 'isSignalAcceptMissingNeutrino'
+    alias_dict['Up4S_isSig'] = 'isSignalAcceptMissingNeutrino'
+    #alias_dict['Up4S_isSignalMissingNeutrino'] = 'isSignalAcceptMissingNeutrino'
     alias_dict['BeamE'] = 'beamE'
     alias_dict['BeamPx'] = 'beamPx'
     alias_dict['BeamPy'] = 'beamPy'
@@ -129,10 +129,10 @@ def define_aliases_Upsilon4S():
       alias_dict['dau{}_motherPDG'.format(i)]= 'daughter({},genMotherPDG)'.format(i)
     for i in range(1,2):
       alias_dict['Bsig_uniqParID'.format(i)]= 'daughter({}, uniqueParticleIdentifier)'.format(i)
-      alias_dict['dau{}_Nelectrons'.format(i)]= 'daughter({},nROE_Charged(cleanMask,11))'.format(i)
-      alias_dict['dau{}_Nmuons'.format(i)]= 'daughter({},nROE_Charged(cleanMask,13))'.format(i)
-      alias_dict['dau{}_Npip'.format(i)]= 'daughter({},nROE_Charged(cleanMask,211))'.format(i)
-      alias_dict['dau{}_NKp'.format(i)]= 'daughter({},nROE_Charged(cleanMask,321))'.format(i)
+      #alias_dict['dau{}_Nelectrons'.format(i)]= 'daughter({},nROE_Charged(cleanMask,11))'.format(i)
+      #alias_dict['dau{}_Nmuons'.format(i)]= 'daughter({},nROE_Charged(cleanMask,13))'.format(i)
+      #alias_dict['dau{}_Npip'.format(i)]= 'daughter({},nROE_Charged(cleanMask,211))'.format(i)
+      #alias_dict['dau{}_NKp'.format(i)]= 'daughter({},nROE_Charged(cleanMask,321))'.format(i)
       alias_dict['dau{}_M'.format(i)]= 'daughter({}, M)'.format(i)
       alias_dict['dau{}_cmp'.format(i)]= 'daughter({}, useCMSFrame(p))'.format(i)
       alias_dict['dau{}_cmE'.format(i)]= 'daughter({}, useCMSFrame(E))'.format(i)
