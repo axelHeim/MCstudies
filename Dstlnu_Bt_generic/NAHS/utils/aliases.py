@@ -21,6 +21,28 @@ def define_aliases_Upsilon4S():
     alias_dict['BeamcmsPx'] = 'useCMSFrame(beamPx)'
     alias_dict['BeamcmsPy'] = 'useCMSFrame(beamPy)'
     alias_dict['BeamcmsPz'] = 'useCMSFrame(beamPz)'
+    for i in range(0,2): # B level
+        alias_dict[f'genUp4S_uniqParID_{i}'] = f'genUpsilon4S(mcDaughter({i}, uniqueParticleIdentifier))'
+
+        for j in range(0,4): # D* l nu + 1 level
+            alias_dict[f'genUp4S_PDG_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},PDG)))'
+            alias_dict[f'abs_genUp4S_PDG_{i}_{j}'] = f'abs(genUpsilon4S(mcDaughter({i}, mcDaughter({j},PDG))))'
+            alias_dict[f'genUp4S_uniqParID_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},uniqueParticleIdentifier)))'
+            if j == 0:
+                for k in range(0,3): # D0 pi +1 level
+                    alias_dict[f'genUp4S_PDG_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},PDG))))'
+                    alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},uniqueParticleIdentifier))))'
+                    if k == 0: # D0 daughters
+                        for l in range(0,6): 
+                            alias_dict[f'genUp4S_PDG_{i}_{j}_{k}_{l}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},PDG)))))'
+                            alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}_{l}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},uniqueParticleIdentifier)))))'
+                            if l < 3:
+                                for m in range(0,6): 
+                                    alias_dict[f'genUp4S_PDG_{i}_{j}_{k}_{l}_{m}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},mcDaughter({m},PDG))))))'
+                                    alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}_{l}_{m}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},mcDaughter({m},uniqueParticleIdentifier))))))'
+ 
+    
+    
     for i in range(0,2):
           alias_dict[f'genUp4S_PDG_{i}'] = f'genUpsilon4S(mcDaughter({i}, PDG))'
           alias_dict[f'genUp4S_charge_{i}'] = f'genUpsilon4S(mcDaughter({i}, charge))'
@@ -121,7 +143,7 @@ def define_aliases_Upsilon4S():
       alias_dict['dau{}_deltaE'.format(i)]= 'daughter({},deltaE)'.format(i)
       alias_dict['dau{}_Mbc'.format(i)]= 'daughter({},Mbc)'.format(i)
       alias_dict['dau{}_FEIRank'.format(i)]= 'daughter({}, extraInfo(FEIProbabilityRank))'.format(i)
-      alias_dict['dau{}_isSignal'.format(i)]= 'daughter({},isSignal)'.format(i)
+      alias_dict['dau{}_isSignal'.format(i)]= 'daughter({},isSignalAcceptMissingNeutrino)'.format(i)
       alias_dict['dau{}_R2'.format(i)]= 'daughter({},R2)'.format(i)
       alias_dict['dau{}_cosTBTO'.format(i)]= 'daughter({},cosTBTO)'.format(i) 
       alias_dict['dau{}_cosThetaBetweenParticleAndNominalB'.format(i)]= 'daughter({},cosThetaBetweenParticleAndNominalB)'.format(i)
@@ -233,6 +255,9 @@ def define_aliases_Upsilon4S():
     alias_dict['D_cmpt'] = 'daughter(1,daughter(0,daughter(0,useCMSFrame(pt))))'
     alias_dict['D_isSignal'] = 'daughter(1,daughter(0,daughter(0,isSignal)))'
     alias_dict['D_uniqParID'] = 'daughter(1,daughter(0,daughter(0,uniqueParticleIdentifier)))'
+    alias_dict['D_decayModeID'] = 'daughter(1,daughter(0,daughter(0,extraInfo(decayModeID))))'
+
+    
     alias_dict['Dst_uniqParID'] = 'daughter(1,daughter(0,uniqueParticleIdentifier))'    
     alias_dict['Dst_M'] = 'daughter(1,daughter(0,M))'
     alias_dict['Dst_E'] = 'daughter(1,daughter(0,E))'

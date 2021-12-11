@@ -33,6 +33,12 @@ add_aliases(AliasDictUps4S)
 
 from bsm_customModule import bsm_customModule
 
+identifier = str(sys.argv[1])
+
+outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/4thRun/"
+#outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
+
+
 # Do some basic basf2 stuff
 path = b2.create_path()
 #ma.inputMdst("/nfs/dust/belle2/user/axelheim/mixed_generic_MC14ri_a/mdst_000001_prod00016816_task10020000001.root", path=path)
@@ -79,6 +85,11 @@ ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 ### cut for D*lnu
 ma.applyEventCuts('''[[[abs_genUp4S_PDG_0_0 == 413.0] and [[abs_genUp4S_PDG_0_1 == 11.0] or [abs_genUp4S_PDG_0_1 == 13.0]] and [[abs_genUp4S_PDG_0_2 == 12.0] or [abs_genUp4S_PDG_0_2 == 14.0]]] or [[abs_genUp4S_PDG_1_0 == 413.0] and [[abs_genUp4S_PDG_1_1 == 11.0] or [abs_genUp4S_PDG_1_1 == 13.0]] and [[abs_genUp4S_PDG_1_2 == 12.0] or [abs_genUp4S_PDG_1_2 == 14.0]]]]''', path)
 
+ma.cutAndCopyList('pi+:saveForEvtCount',"pi+:eventShapeForSkims",'', path= path)
+ma.rankByHighest('pi+:saveForEvtCount', 'px', numBest=1, path=path)
+ma.variablesToNtuple('pi+:saveForEvtCount', variables="px", filename=outpath + 'evt_counter_' + identifier + '.root', path=path)
+
+
 ### FEI part
 particles = fei.get_default_channels(baryonic=True)
 
@@ -113,15 +124,9 @@ Hc_dict={
 for Hc in all_Hcs:
     path.add_module('MCMatcherParticles', listName=f'{Hc_dict[Hc]}:genericsigProb', looseMCMatching=True)
 
-    ma.applyCuts(f'{Hc_dict[Hc]}:genericsigProb', 'isSignalAcceptMissingGamma == 1 and abs(genMotherPDG) == 511.0', path=path)
+    ma.applyCuts(f'{Hc_dict[Hc]}:genericsigProb', 'isSignalAcceptMissingNeutrino == 1 and abs(genMotherPDG) == 511.0', path=path)
 
-    """ variablesToNtuple(f'{Hc_dict[Hc]}:genericsigProb',
-                    ['extraInfo(SignalProbability)',
-                    'isSignalAcceptMissingGamma',
-                    'PDG'] + Hc_variables,
-                    filename=outpath + f'{Hc}_' + identifier + '.root',
-                    path=path)
-    """
+
 sigProbList = [f'{Hc_dict[Hc]}:genericsigProb' for Hc in all_Hcs]
 
 
@@ -238,16 +243,16 @@ ma.cutAndCopyList('mu+:pred_Bsig', 'mu+:mostlikely', "[NN_prediction == 2]", pat
 ma.reconstructDecay('pi0:forD0 -> gamma:pred_Bsig gamma:pred_Bsig','', path=path)
 
 #ma.reconstructDecay('D0:kpi -> K-:pred_Bsig pi+:pred_Bsig', '1.8 < M < 1.9', path=path)
-ma.reconstructDecay('D0:kpi -> K-:pred_Bsig pi+:pred_Bsig', '', path=path)
+ma.reconstructDecay('D0:kpi -> K-:pred_Bsig pi+:pred_Bsig',  '', dmID=21001, path=path)
 
 #ma.reconstructDecay('D0:kpipipi -> K-:pred_Bsig pi+:pred_Bsig pi-:pred_Bsig pi+:pred_Bsig', '1.8 < M < 1.9', path=path)
-ma.reconstructDecay('D0:kpipipi -> K-:pred_Bsig pi+:pred_Bsig pi-:pred_Bsig pi+:pred_Bsig', '', path=path)
+ma.reconstructDecay('D0:kpipipi -> K-:pred_Bsig pi+:pred_Bsig pi-:pred_Bsig pi+:pred_Bsig', '', dmID=21002, path=path)
 
 #ma.reconstructDecay('D0:kpipi0 -> K-:pred_Bsig pi+:pred_Bsig pi0:forD0', '1.8 < M < 1.9', path=path)
-ma.reconstructDecay('D0:kpipi0 -> K-:pred_Bsig pi+:pred_Bsig pi0:forD0', '', path=path)
+ma.reconstructDecay('D0:kpipi0 -> K-:pred_Bsig pi+:pred_Bsig pi0:forD0', '', dmID=21003, path=path)
 
 #ma.reconstructDecay('D0:kpipipipi0 -> K-:pred_Bsig pi+:pred_Bsig pi-:pred_Bsig pi+:pred_Bsig pi0:forD0', '1.8 < M < 1.9', path=path)
-ma.reconstructDecay('D0:kpipipipi0 -> K-:pred_Bsig pi+:pred_Bsig pi-:pred_Bsig pi+:pred_Bsig pi0:forD0', '', path=path)
+ma.reconstructDecay('D0:kpipipipi0 -> K-:pred_Bsig pi+:pred_Bsig pi-:pred_Bsig pi+:pred_Bsig pi0:forD0', '', dmID=21004, path=path)
 ma.copyLists('D0:cand', ['D0:kpi','D0:kpipipi','D0:kpipi0','D0:kpipipipi0'], path=path)
 path.add_module('MCMatcherParticles', listName='D0:cand', looseMCMatching=True)
 
@@ -384,18 +389,16 @@ ma.cutAndCopyList('B0:sig_onlyUsedOne', "anti-B0:sig", "[isDescendantOfList(Upsi
 v.addAlias('basf2_used', 'isDescendantOfList(Upsilon(4S):DXtag)')
 v.addAlias('basf2_Bsig', 'isDescendantOfList(B0:sig_onlyUsedOne)')
 
+v.addAlias('Hc_used', 'extraInfo(Hc_used)')
 
-outvars_FSPs += ['basf2_used','basf2_Bsig']
-
-
-
+outvars_FSPs += ['basf2_used','basf2_Bsig','Hc_used']
 
 
 
 
-identifier = str(sys.argv[1])
-outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/thirdRun/"
-#outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
+
+
+
 
 
 # save Upsilon(4S)
