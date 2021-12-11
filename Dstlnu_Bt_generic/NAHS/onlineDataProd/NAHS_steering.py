@@ -130,7 +130,7 @@ Hc_dict={
 for Hc in all_Hcs:
     path.add_module('MCMatcherParticles', listName=f'{Hc_dict[Hc]}:genericsigProb', looseMCMatching=True)
 
-    applyCuts(f'{Hc_dict[Hc]}:genericsigProb', 'isSignalAcceptMissingGamma == 1 and abs(genMotherPDG) == 511.0', path=path)
+    applyCuts(f'{Hc_dict[Hc]}:genericsigProb', 'isSignalAcceptMissingNeutrino == 1 and abs(genMotherPDG) == 511.0', path=path)
 
     variablesToNtuple(f'{Hc_dict[Hc]}:genericsigProb',
                     ['extraInfo(SignalProbability)',
