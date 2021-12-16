@@ -110,16 +110,25 @@ class bsm_customModule(b2.Module):
         #print("NN_input_features.shape:",NN_input_features.shape)
         #print("")
         
-        SA_pred = self.model(NN_input_features)
+        
+        # shuffle the order of the input particles
+        r=torch.randperm(shape[0])
+        #print("r:",r)
+        
+        shuffled_input=NN_input_features[r, :, :]
+        
+
+        # pass input into the NN
+        SA_pred = self.model(shuffled_input)
 
         probs = torch.softmax(SA_pred, dim=1)  # (N, C, d1)
         winners = probs.argmax(dim=1)
          
+        
+        
+        #print("winners.shape:",winners.shape)
         num_particles = NN_input_features.shape[0]
         particle_i=0
-        
-        print("winners.shape:",winners.shape)
-        
         for p_list_name in self.particle_lists:
             # Get the particle list (note this is a regular Particle list, not MCParticle)
             p_list = Belle2.PyStoreObj(p_list_name)            
@@ -130,8 +139,10 @@ class bsm_customModule(b2.Module):
                     continue
                 #print("Hc_used at addExtraInfo:",Hc_used)
                 
+                index_Shuffreversed = (r == particle_i).nonzero(as_tuple=True)[0].item()
+                #print("particle_i:",particle_i,"index_Shuffreversed:",index_Shuffreversed)
                 
-                particle.addExtraInfo("NN_prediction", winners[0,particle_i].item()) 
+                particle.addExtraInfo("NN_prediction", winners[0,index_Shuffreversed].item()) 
                 
                 
                 #print("winners[0,particle_i]:", winners[0,particle_i].item())

@@ -218,6 +218,7 @@ def define_aliases_Upsilon4S():
       alias_dict['lep_mccmp']= 'daughter(1,daughter({}, useCMSFrame(mcP)))'.format(i)
       alias_dict['lep_mccmpt']= 'daughter(1,daughter({}, useCMSFrame(mcPT)))'.format(i)
       alias_dict['lep_mcPDG']= 'daughter(1,daughter({},mcPDG))'.format(i)
+      alias_dict['lep_PDG']= 'daughter(1,daughter({},PDG))'.format(i)
       alias_dict['lep_genParticleID']= 'daughter(1,daughter({},genParticleID))'.format(i)
       alias_dict['lep_motherPDG']= 'daughter(1,daughter({},genMotherPDG))'.format(i)
       alias_dict['lep_gmotherPDG']= 'daughter(1,daughter({},genMotherPDG(1)))'.format(i)

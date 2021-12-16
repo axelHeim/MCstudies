@@ -35,8 +35,8 @@ from bsm_customModule import bsm_customModule
 
 identifier = str(sys.argv[1])
 
-outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/4thRun/"
-#outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
+outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/6thRun/"
+outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
 
 
 # Do some basic basf2 stuff
@@ -207,6 +207,7 @@ outvars_FSPs += ['isSignal', 'uniqueParticleIdentifier','mcErrors','mcPDG','genM
  'genMotherPDG','charge','dr','dz','clusterReg','clusterE9E21','M','PDG','genParticleID']
 outvars_FSPs +=  vc.kinematics 
 outvars_FSPs += vc.pid 
+outvars_FSPs += nn_vars 
 
 
 outvars_FSPs.append("NN_prediction")
@@ -418,7 +419,9 @@ ma.variablesToNtuple('Upsilon(4S):DXtag',
 
 
 
-
+# delete duplicates in outvars
+from collections import OrderedDict
+outvars_FSPs = list(OrderedDict.fromkeys(outvars_FSPs))
 
 # save FSPs
 ma.variablesToNtuple('pi+:mostlikely', variables=outvars_FSPs, filename=outpath + 'pions_' + identifier + '.root', path=path)
@@ -429,7 +432,7 @@ ma.variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename=ou
 
 
 
-b2.process(path)#, max_event=20000)
+b2.process(path, max_event=2000)
 
 
 print("**************")
