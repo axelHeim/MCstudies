@@ -2,4 +2,10 @@
 *.pdf
 *.jpg
 *.root
+*.csv
 .ipynb_checkpoints
+Dstlnu_Bt_generic/load_NN_to_basf2/basf2_custom_module/*
+
+
+Dstlnu_Bt_generic/load_NN_to_basf2/create_ROOT_input/
+Dstlnu_Bt_generic/load_NN_to_basf2/make_weightfile/
