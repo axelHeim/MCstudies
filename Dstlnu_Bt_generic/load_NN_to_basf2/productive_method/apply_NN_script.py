@@ -35,8 +35,8 @@ from bsm_customModule import bsm_customModule
 
 identifier = str(sys.argv[1])
 
-outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/6thRun/"
-outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
+outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/9thRun/"
+#outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
 
 
 # Do some basic basf2 stuff
@@ -148,8 +148,8 @@ stdMostLikely(path=path)
 
 
 
-nn_vars = ["px","py","pz","E","M","charge","dr","dz","clusterReg","clusterE9E21","pionID","kaonID","electronID","muonID","protonID",
-     "x","y","z"]
+nn_vars = ["px","py","pz","E","M","charge","dr","dz","clusterReg","clusterE9E21","pionID","kaonID",
+           "electronID","muonID","protonID"]
 
 stdPhotons('all', path=path)
 ma.cutAndCopyList('gamma:goodBelleGamma', 'gamma:all', 
@@ -168,8 +168,8 @@ from BranchSeparatorModel import BranchSeparatorModel
 
 
 
-model_dir="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/saved_models/NAHSA_Gmodes_fixedD0modes/NAHS_allEvts_twoSubs_fixedD0run/NAHSA_allExtras/256_0_64_0.1_4/"
-checkpoint_name = "model_checkpoint_model_perfectSA=0.7651.pt"
+model_dir="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/saved_models/NAHSA_Gmodes_fixedD0modes/NAHS_allEvts_twoSubs_fixedD0run/NAHSA_no_xyz/256_0_64_0.1_4/"
+checkpoint_name = "model_checkpoint_model_perfectSA=0.7674.pt"
 specs_output_label = "256_0_64_0.1_4"
 num_classes = 3    
 
@@ -432,7 +432,7 @@ ma.variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename=ou
 
 
 
-b2.process(path, max_event=2000)
+b2.process(path)#, max_event=20000)
 
 
 print("**************")
