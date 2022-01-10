@@ -49,6 +49,7 @@ class bsm_customModule(b2.Module):
     def event(self):
         ''' Run every event '''
         print("\n start of event")
+        self.model.eval()
         evt_num = self.eventinfo.getEvent()
         print("evt_num:", evt_num)
         
@@ -125,12 +126,13 @@ class bsm_customModule(b2.Module):
             #print("in pad_input:   num_particles:", num_particles)
             
 
-            torch.set_printoptions(threshold=10_000)
-            #print(shuffled_input) # prints the whole tensor
+            torch.set_printoptions(threshold=10_000)        
+            #print("shuffled_input:",shuffled_input) # prints the whole tensor
 
 
 
-            input_padded = torch.ones(pad_dim, 1, shape[1]) * -1.
+
+            input_padded = torch.ones(pad_dim, 1, shape[1]) * 0.
 
             particle_counter = 0
             for i in range(pad_dim):
@@ -146,6 +148,7 @@ class bsm_customModule(b2.Module):
         
         
         #print("shuffled_input.shape:",shuffled_input.shape)
+        #print("shuffled_input:",shuffled_input) # prints the whole tensor
         
 
         # pass input into the NN
@@ -157,6 +160,7 @@ class bsm_customModule(b2.Module):
         probs = torch.softmax(SA_pred, dim=1)  # (N, C, d1)
         winners = probs.argmax(dim=1)
         #print("winners.shape:",winners.shape)
+        #print("winners:",winners)
          
         # unpad winners if pad_input
         if pad_input:
@@ -173,8 +177,8 @@ class bsm_customModule(b2.Module):
             winners=winners_unpadded
         
         #print("winners.shape:",winners.shape)
+        #print("winners:",winners)
         
-        #print("winners.shape:",winners.shape)
         
         particle_i=0
         for p_list_name in self.particle_lists:
