@@ -35,7 +35,7 @@ from bsm_customModule import bsm_customModule
 
 identifier = str(sys.argv[1])
 
-outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/11thRun/"
+outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/15thRun/"
 #outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
 
 
@@ -83,7 +83,7 @@ ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
 
 ### cut for D*lnu
-ma.applyEventCuts('''[[[abs_genUp4S_PDG_0_0 == 413.0] and [[abs_genUp4S_PDG_0_1 == 11.0] or [abs_genUp4S_PDG_0_1 == 13.0]] and [[abs_genUp4S_PDG_0_2 == 12.0] or [abs_genUp4S_PDG_0_2 == 14.0]]] or [[abs_genUp4S_PDG_1_0 == 413.0] and [[abs_genUp4S_PDG_1_1 == 11.0] or [abs_genUp4S_PDG_1_1 == 13.0]] and [[abs_genUp4S_PDG_1_2 == 12.0] or [abs_genUp4S_PDG_1_2 == 14.0]]]]''', path)
+# ma.applyEventCuts('''[[[abs_genUp4S_PDG_0_0 == 413.0] and [[abs_genUp4S_PDG_0_1 == 11.0] or [abs_genUp4S_PDG_0_1 == 13.0]] and [[abs_genUp4S_PDG_0_2 == 12.0] or [abs_genUp4S_PDG_0_2 == 14.0]]] or [[abs_genUp4S_PDG_1_0 == 413.0] and [[abs_genUp4S_PDG_1_1 == 11.0] or [abs_genUp4S_PDG_1_1 == 13.0]] and [[abs_genUp4S_PDG_1_2 == 12.0] or [abs_genUp4S_PDG_1_2 == 14.0]]]]''', path)
 
 ma.cutAndCopyList('pi+:saveForEvtCount',"pi+:eventShapeForSkims",'', path= path)
 ma.rankByHighest('pi+:saveForEvtCount', 'px', numBest=1, path=path)
@@ -101,13 +101,14 @@ feistate = fei.get_path(particles, configuration)
 path.add_path(feistate.path)
 
 # now take best H_c and check if isSignal==1
-ma.cutAndCopyList('anti-D*0:genericsigProb',"anti-D*0:generic",'extraInfo(SignalProbability)>0.001 and 0.139<massDifference(0)<0.16', path= path)
-ma.cutAndCopyList('D*-:genericsigProb',"D*-:generic",'extraInfo(SignalProbability)>0.001 and 0.139<massDifference(0)<0.16', path= path)
-ma.cutAndCopyList('D-:genericsigProb',"D-:generic",'extraInfo(SignalProbability)>0.001', path= path)
-ma.cutAndCopyList('anti-D0:genericsigProb',"anti-D0:generic",'extraInfo(SignalProbability)>0.001', path= path)
-ma.cutAndCopyList('anti-Lambda_c-:genericsigProb',"anti-Lambda_c-:generic",'extraInfo(SignalProbability)>0.001', path= path)
-ma.cutAndCopyList('D_s+:genericsigProb',"D_s+:generic",'extraInfo(SignalProbability)>0.001', path= path)
-ma.cutAndCopyList('J/psi:genericsigProb',"J/psi:generic",'extraInfo(SignalProbability)>0.001', path= path)
+sigprob_cut = 0.001
+ma.cutAndCopyList('anti-D*0:genericsigProb',"anti-D*0:generic",'extraInfo(SignalProbability)>{} and 0.139<massDifference(0)<0.16'.format(sigprob_cut), path= path)
+ma.cutAndCopyList('D*-:genericsigProb',"D*-:generic",'extraInfo(SignalProbability)>{} and 0.139<massDifference(0)<0.16'.format(sigprob_cut), path= path)
+ma.cutAndCopyList('D-:genericsigProb',"D-:generic",'extraInfo(SignalProbability)>{}'.format(sigprob_cut), path= path)
+ma.cutAndCopyList('anti-D0:genericsigProb',"anti-D0:generic",'extraInfo(SignalProbability)>{}'.format(sigprob_cut), path= path)
+ma.cutAndCopyList('anti-Lambda_c-:genericsigProb',"anti-Lambda_c-:generic",'extraInfo(SignalProbability)>{}'.format(sigprob_cut), path= path)
+ma.cutAndCopyList('D_s+:genericsigProb',"D_s+:generic",'extraInfo(SignalProbability)>{}'.format(sigprob_cut), path= path)
+ma.cutAndCopyList('J/psi:genericsigProb',"J/psi:generic",'extraInfo(SignalProbability)>{}'.format(sigprob_cut), path= path)
 
 all_Hcs = ["DstpDstl" ,"Dst0Dstl", "DpDstl","D0Dstl", "LcDstl", "DsDstl","JpsiDstl"]
 Hc_dict={
@@ -124,17 +125,24 @@ Hc_dict={
 for Hc in all_Hcs:
     path.add_module('MCMatcherParticles', listName=f'{Hc_dict[Hc]}:genericsigProb', looseMCMatching=True)
 
-    ma.applyCuts(f'{Hc_dict[Hc]}:genericsigProb', 'isSignalAcceptMissingNeutrino == 1 and abs(genMotherPDG) == 511.0', path=path)
+    #ma.applyCuts(f'{Hc_dict[Hc]}:genericsigProb', 'isSignalAcceptMissingNeutrino == 1 and abs(genMotherPDG) == 511.0', path=path)
 
 
 sigProbList = [f'{Hc_dict[Hc]}:genericsigProb' for Hc in all_Hcs]
 
 
 # only proceed if the lists contain exactly one Hc candidate
-ma.applyEventCuts(f'''[formula(countInList({sigProbList[0]}) + countInList({sigProbList[1]}) + countInList({sigProbList[2]}) + countInList({sigProbList[3]}) + countInList({sigProbList[4]}) + countInList({sigProbList[5]}) + countInList({sigProbList[6]})) == 1]''', path)
+#ma.applyEventCuts(f'''[formula(countInList({sigProbList[0]}) + countInList({sigProbList[1]}) + countInList({sigProbList[2]}) + countInList({sigProbList[3]}) + countInList({sigProbList[4]}) + countInList({sigProbList[5]}) + countInList({sigProbList[6]})) == 1]''', path)
 # combine lists, should now contain exactly one Hc candidate
 ma.combineAllParticles(sigProbList, "Hc:used", cut='', path=path)
 
+ma.rankByHighest("Hc:used", 'extraInfo(SignalProbability)', numBest=1,
+              outputVariable='Hc_FEIProbabilityRank', path=path)
+
+
+
+# only proceed if the lists contain exactly one Hc candidate
+ma.applyEventCuts('[countInList(Hc:used) == 1]', path)
 
 
 ###################
@@ -401,7 +409,7 @@ outvars_FSPs += ['basf2_used','basf2_Bsig','Hc_used']
 
 
 
-
+outvars_Ups4S.append("mcPDG")
 # save Upsilon(4S)
 ma.variablesToNtuple('Upsilon(4S):DXtag',
                   [
@@ -432,7 +440,9 @@ ma.variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename=ou
 
 
 
-b2.process(path)#, max_event=2000)
+b2.process(path)#, max_event=200)
+
+print(b2.statistics)
 
 
 print("**************")
