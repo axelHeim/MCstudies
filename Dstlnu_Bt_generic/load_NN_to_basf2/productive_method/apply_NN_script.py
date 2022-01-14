@@ -1,8 +1,4 @@
-# Now let's import torch and basf2 and try to load our model
-
-
 import torch
-
 import basf2 as b2
 
 import modularAnalysis as ma
