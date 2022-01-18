@@ -31,7 +31,8 @@ from bsm_customModule import bsm_customModule
 
 identifier = str(sys.argv[1])
 
-outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/15thRun/"
+#outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/16thRun/"
+outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/3sigprobCuts/"
 #outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
 
 
@@ -87,7 +88,7 @@ ma.variablesToNtuple('pi+:saveForEvtCount', variables="px", filename=outpath + '
 
 
 ### FEI part
-particles = fei.get_default_channels(baryonic=True)
+particles = fei.get_default_channels(baryonic=True, semileptonic=False)
 
 
 b2.conditions.prepend_globaltag(ma.getAnalysisGlobaltag()) # needed for FEI prefix  FEIv4_2021_MC14_release_05_01_12  ;from: https://questions.belle2.org/question/11130/b2bii-global-tag-error-in-release-05-02-06/
@@ -98,6 +99,12 @@ path.add_path(feistate.path)
 
 # now take best H_c and check if isSignal==1
 sigprob_cut = 0.001
+if len(sys.argv)>3:
+    sigprob_cut = float(sys.argv[3])
+    print("######################")
+    print("sigprob_cut set via terminal to:", sigprob_cut)
+    print("######################")
+    
 ma.cutAndCopyList('anti-D*0:genericsigProb',"anti-D*0:generic",'extraInfo(SignalProbability)>{} and 0.139<massDifference(0)<0.16'.format(sigprob_cut), path= path)
 ma.cutAndCopyList('D*-:genericsigProb',"D*-:generic",'extraInfo(SignalProbability)>{} and 0.139<massDifference(0)<0.16'.format(sigprob_cut), path= path)
 ma.cutAndCopyList('D-:genericsigProb',"D-:generic",'extraInfo(SignalProbability)>{}'.format(sigprob_cut), path= path)
@@ -442,8 +449,5 @@ print(b2.statistics)
 
 
 print("**************")
-
 print("THIS IS GONNA CHANGE THE WORLD!!!")
-
 print("**************")
-

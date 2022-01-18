@@ -48,10 +48,10 @@ class bsm_customModule(b2.Module):
 
     def event(self):
         ''' Run every event '''
-        print("\n start of event")
+        #print("\n start of event")
         self.model.eval()
         evt_num = self.eventinfo.getEvent()
-        print("evt_num:", evt_num)
+        #print("evt_num:", evt_num)
         
 
         
@@ -200,7 +200,7 @@ class bsm_customModule(b2.Module):
                 #print("winners[0,particle_i]:", winners[0,particle_i].item())
 
                 particle_i += 1
-        print("end of event")
+        # print("end of event")
           
                 
                            
