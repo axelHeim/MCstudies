@@ -31,9 +31,9 @@ from bsm_customModule import bsm_customModule
 
 identifier = str(sys.argv[1])
 
-#outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/16thRun/"
-outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/3sigprobCuts/"
-#outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
+outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/17thRun/"
+#outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/3sigprobCuts/"
+outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
 
 
 # Do some basic basf2 stuff
@@ -58,6 +58,15 @@ v.addAlias('E_ECL_pi', 'totalECLEnergyOfParticlesInList(pi+:eventShapeForSkims)'
 v.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSkims)')
 v.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
 
+### cut for D*lnu
+# ma.applyEventCuts('''[[[abs_genUp4S_PDG_0_0 == 413.0] and [[abs_genUp4S_PDG_0_1 == 11.0] or [abs_genUp4S_PDG_0_1 == 13.0]] and [[abs_genUp4S_PDG_0_2 == 12.0] or [abs_genUp4S_PDG_0_2 == 14.0]]] or [[abs_genUp4S_PDG_1_0 == 413.0] and [[abs_genUp4S_PDG_1_1 == 11.0] or [abs_genUp4S_PDG_1_1 == 13.0]] and [[abs_genUp4S_PDG_1_2 == 12.0] or [abs_genUp4S_PDG_1_2 == 14.0]]]]''', path)
+
+ma.cutAndCopyList('pi+:saveForEvtCount',"pi+:eventShapeForSkims",'', path= path)
+ma.rankByHighest('pi+:saveForEvtCount', 'px', numBest=1, path=path)
+ma.variablesToNtuple('pi+:saveForEvtCount', variables="px", filename=outpath + 'evt_counter_' + identifier + '.root', path=path)
+
+
+
 
 ma.applyEventCuts('nCleanedTracks(abs(z0) < 2.0 and abs(d0) < 0.5 and pt>0.1)>=3', path=path)
 ma.applyEventCuts('nCleanedECLClusters(0.296706 < theta < 2.61799 and E>0.2)>=3', path=path)
@@ -79,12 +88,6 @@ ma.buildEventShape(inputListNames=['pi+:eventShapeForSkims', 'gamma:eventShapeFo
 ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
 
-### cut for D*lnu
-# ma.applyEventCuts('''[[[abs_genUp4S_PDG_0_0 == 413.0] and [[abs_genUp4S_PDG_0_1 == 11.0] or [abs_genUp4S_PDG_0_1 == 13.0]] and [[abs_genUp4S_PDG_0_2 == 12.0] or [abs_genUp4S_PDG_0_2 == 14.0]]] or [[abs_genUp4S_PDG_1_0 == 413.0] and [[abs_genUp4S_PDG_1_1 == 11.0] or [abs_genUp4S_PDG_1_1 == 13.0]] and [[abs_genUp4S_PDG_1_2 == 12.0] or [abs_genUp4S_PDG_1_2 == 14.0]]]]''', path)
-
-ma.cutAndCopyList('pi+:saveForEvtCount',"pi+:eventShapeForSkims",'', path= path)
-ma.rankByHighest('pi+:saveForEvtCount', 'px', numBest=1, path=path)
-ma.variablesToNtuple('pi+:saveForEvtCount', variables="px", filename=outpath + 'evt_counter_' + identifier + '.root', path=path)
 
 
 ### FEI part
@@ -443,7 +446,7 @@ ma.variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename=ou
 
 
 
-b2.process(path)#, max_event=200)
+b2.process(path, max_event=200)
 
 print(b2.statistics)
 
