@@ -33,7 +33,7 @@ identifier = str(sys.argv[1])
 
 outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/17thRun/"
 #outpath="/nfs/dust/belle2/user/axelheim/MC_studies/Dstlnu_Bt_generic/appliedNNdata/3sigprobCuts/"
-outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
+#outpath="/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/load_NN_to_basf2/productive_method/testOut/"
 
 
 # Do some basic basf2 stuff
@@ -446,7 +446,7 @@ ma.variablesToNtuple('gamma:goodBelleGamma', variables=outvars_FSPs, filename=ou
 
 
 
-b2.process(path, max_event=200)
+b2.process(path)#, max_event=200)
 
 print(b2.statistics)
 
