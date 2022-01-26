@@ -1,3 +1,62 @@
+def define_aliases_Bsig():
+    alias_dict ={}
+
+
+    alias_dict['lep_genMotherID'] = 'daughter(1 ,genMotherID)'
+    alias_dict['lep_genMotherPDG'] = 'daughter(1 ,genMotherPDG)'
+    alias_dict['lep_mcPDG'] = 'daughter(1 ,mcPDG)'
+    alias_dict['lep_PDG'] = 'daughter(1 ,PDG)'
+    alias_dict['lep_isSignal'] = 'daughter(1 ,isSignal)'
+    alias_dict['lep_motherUniqParID'] = 'daughter(1 ,mcMother(uniqueParticleIdentifier))'
+    alias_dict['lep_uniqParID'] = 'daughter(1 ,uniqueParticleIdentifier)'
+    
+    
+    alias_dict['Bsig_genMotherID'] = 'genMotherID'
+    alias_dict['Bsig_genMotherPDG'] = 'genMotherPDG'
+    alias_dict['Bsig_mcPDG'] = 'mcPDG'
+    alias_dict['Bsig_PDG'] = 'PDG'
+    alias_dict['Bsig_isSignal'] = 'isSignal'
+    alias_dict['Bsig_motherUniqParID'] = 'mcMother(uniqueParticleIdentifier)'
+    alias_dict['basf2Bsig_uniqParID'] = 'uniqueParticleIdentifier'
+    alias_dict['Bsig_genParticleID'] = 'genParticleID'
+     
+    for i in range(0,2): # B level
+        alias_dict[f'genUp4S_uniqParID_{i}'] = f'genUpsilon4S(mcDaughter({i}, uniqueParticleIdentifier))'
+
+        for j in range(0,4): # D* l nu + 1 level
+            alias_dict[f'genUp4S_PDG_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},PDG)))'
+            alias_dict[f'abs_genUp4S_PDG_{i}_{j}'] = f'abs(genUpsilon4S(mcDaughter({i}, mcDaughter({j},PDG))))'
+            alias_dict[f'genUp4S_uniqParID_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},uniqueParticleIdentifier)))'
+            if j == 0:
+                for k in range(0,3): # D0 pi +1 level
+                    alias_dict[f'genUp4S_PDG_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},PDG))))'
+                    alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},uniqueParticleIdentifier))))'
+                    if k == 0: # D0 daughters
+                        for l in range(0,6): 
+                            alias_dict[f'genUp4S_PDG_{i}_{j}_{k}_{l}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},PDG)))))'
+                            alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}_{l}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},uniqueParticleIdentifier)))))'
+                            if l < 3:
+                                for m in range(0,6): 
+                                    alias_dict[f'genUp4S_PDG_{i}_{j}_{k}_{l}_{m}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},mcDaughter({m},PDG))))))'
+                                    alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}_{l}_{m}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mcDaughter({l},mcDaughter({m},uniqueParticleIdentifier))))))'
+    
+    for i in range(0,2):
+          for j in range(0,3):
+              alias_dict[f'genUp4S_PDG_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},PDG)))'
+              alias_dict[f'genUp4S_mdstIndex_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mdstIndex)))'
+              alias_dict[f'genUp4S_genParticleID_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},genParticleID)))'
+              alias_dict[f'genUp4S_uniqParID_{i}_{j}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},uniqueParticleIdentifier)))'
+              if j == 0:
+                for k in range(0,2):
+                   alias_dict[f'genUp4S_PDG_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},PDG))))'
+                   alias_dict[f'genUp4S_mdstIndex_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},mdstIndex))))'
+                   alias_dict[f'genUp4S_genParticleID_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},genParticleID))))'
+                   alias_dict[f'genUp4S_uniqParID_{i}_{j}_{k}'] = f'genUpsilon4S(mcDaughter({i}, mcDaughter({j},mcDaughter({k},uniqueParticleIdentifier))))'
+    
+    
+    return(alias_dict)
+
+
 def define_aliases_Upsilon4S():
     alias_dict ={}
 #uniqueParticleIdentifier uniqParID

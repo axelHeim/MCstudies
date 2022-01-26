@@ -15,7 +15,7 @@ import vertex as vx
 
 import sys
 sys.path.insert(1, '/afs/desy.de/user/a/axelheim/private/MC_studies/Dstlnu_Bt_generic/NAHS/utils')
-from aliases import define_aliases_Hc, define_aliases_FSPs, define_aliases_Upsilon4S
+from aliases import define_aliases_Bsig, define_aliases_FSPs, define_aliases_Upsilon4S
 
 import pdg
 pdg.add_particle("Hc", 9876555, 0, 0, 0, 0)
@@ -25,8 +25,6 @@ def add_aliases(alias_dict={}):
    for key,value in alias_dict.items():
       v.addAlias(key,value)
 
-AliasDictHc= define_aliases_Hc()
-add_aliases(AliasDictHc)
 AliasDictUps4S= define_aliases_Upsilon4S()
 add_aliases(AliasDictUps4S)
 
@@ -35,7 +33,6 @@ AliasDictFSPs= define_aliases_FSPs()
 print(AliasDictFSPs)
 add_aliases(AliasDictFSPs)
 outvars_FSPs = list(AliasDictFSPs.keys()) 
-outvars_Ups4S = list(AliasDictUps4S.keys()) 
 
 outvars_FSPs += ['isSignal', 'uniqueParticleIdentifier','mcErrors','mcPDG','genMotherID','genMotherP',
  'genMotherPDG','charge','dr','dz','clusterReg','clusterE9E21','M','PDG','genParticleID']
@@ -76,9 +73,6 @@ v.addAlias('E_ECL_gamma', 'totalECLEnergyOfParticlesInList(gamma:eventShapeForSk
 v.addAlias('E_ECL', 'formula(E_ECL_pi+E_ECL_gamma)')
 
 
-ma.cutAndCopyList('pi+:saveForEvtCount',"pi+:eventShapeForSkims",'', path= path)
-ma.rankByHighest('pi+:saveForEvtCount', 'px', numBest=1, path=path)
-ma.variablesToNtuple('pi+:saveForEvtCount', variables="px", filename=outpath + 'evt_counter_' + identifier + '.root', path=path)
 
 
 
@@ -104,6 +98,9 @@ ma.applyEventCuts('foxWolframR2_maskedNaN<0.4 and nTracks>=4', path=path)
 
 
 
+ma.cutAndCopyList('pi+:saveForEvtCount',"pi+:eventShapeForSkims",'', path= path)
+ma.rankByHighest('pi+:saveForEvtCount', 'px', numBest=1, path=path)
+ma.variablesToNtuple('pi+:saveForEvtCount', variables="px", filename=outpath + 'evt_counter_' + identifier + '.root', path=path)
 
 
 
@@ -158,22 +155,35 @@ path.add_module('MCMatcherParticles', listName='anti-B0:Dstkpimu')
 ma.copyLists('anti-B0:sig', ['anti-B0:Dstkpie', 'anti-B0:Dstkpimu'], path=path)
 
 
-
-vx.fitVertex('anti-B0:sig',0.0, path=path)
-
+#vx.fitVertex('anti-B0:sig', 0.0, path=path)
+vx.treeFit("anti-B0:sig", conf_level=0, path=path)
 
 # BCS for Bsig based on chi squared of vertex fit as described here (3.1) by Chaoyi: https://docs.belle2.org/record/2084/files/BELLE2-CONF-PH-2020-008.pdf
 ma.cutAndCopyList('anti-B0:BCS', 'anti-B0:sig', "", path=path)
+
 ma.rankByLowest("anti-B0:BCS", 'abs(chiProb)', numBest=1, outputVariable='chiSq_rank', path=path)
+v.addAlias('chiSquare_rank', 'extraInfo(chiSq_rank)')
 
 
-""" 
-# BCS for Bsig based on deltaE
-ma.cutAndCopyList('anti-B0:BCS', 'anti-B0:sig', "[abs(deltaE) < 0.5]", path=path)
-ma.rankByLowest("anti-B0:BCS", 'abs(deltaE)', numBest=1, outputVariable='deltaErank', path=path)
-"""
+
 # only proceed if the list con tain exactly one Bsig candidate
 ma.applyEventCuts('[countInList(anti-B0:BCS) == 1]', path)
+
+
+
+
+AliasDictBsig= define_aliases_Bsig()
+print(AliasDictBsig)
+add_aliases(AliasDictBsig)
+outvars_Bsig = list(AliasDictBsig.keys()) 
+
+ma.variablesToNtuple('anti-B0:BCS',
+                  ['chiSquare_rank', 'chiProb'] + outvars_Bsig,
+                  filename=outpath + 'Bsig_cand_' + identifier + '.root',
+                  path=path)
+
+
+
 
 
 """ 
@@ -204,19 +214,24 @@ outvars_FSPs.append('Bsig_used')
 # delete duplicates in outvars
 from collections import OrderedDict
 outvars_FSPs = list(OrderedDict.fromkeys(outvars_FSPs))
-# save ROE FSPs of Bsig candidate
-ma.variablesToNtuple('ROE_of_Bsig:all',
-                  ["foxWolframR2_maskedNaN",
-                   'foxWolframR2',
-		   'extraInfo(FEIProbabilityRank)',
-                   "nTracks"] +  outvars_FSPs,
-                  filename=outpath + 'Bsig_ROE_FSPs_' + identifier + '.root',
-                  path=path)
+
+#roeinputs = ['gamma:forX','pi+:forX','K+:forX','p+:forX', 'e+:cande','mu+:candmu']
 
 
 
 
-b2.process(path, max_event=200)
+# save all FSPs
+ma.variablesToNtuple('pi+:forX', variables=outvars_FSPs, filename=outpath + 'pions_' + identifier + '.root', path=path)
+ma.variablesToNtuple('K+:forX', variables=outvars_FSPs, filename=outpath + 'kaons_' + identifier + '.root', path=path)
+ma.variablesToNtuple('e+:cande', variables=outvars_FSPs, filename=outpath + 'electrons_' + identifier + '.root', path=path)
+ma.variablesToNtuple('mu+:candmu', variables=outvars_FSPs, filename=outpath + 'muons_' + identifier + '.root', path=path)
+ma.variablesToNtuple('p+:forX', variables=outvars_FSPs, filename=outpath + 'protons_' + identifier + '.root', path=path)
+ma.variablesToNtuple('gamma:forX', variables=outvars_FSPs, filename=outpath + 'gammas_' + identifier + '.root', path=path)
+
+
+
+
+b2.process(path, max_event=80000)
 
 print(b2.statistics)
 
