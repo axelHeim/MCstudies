@@ -1,3 +1,7 @@
+## run with: 
+# no source, no conda deactivate
+
+
 import basf2 as b2
 
 import modularAnalysis as ma
@@ -46,7 +50,8 @@ outvars_FSPs += nn_vars
 
 identifier = str(sys.argv[1])
 
-outpath="/nfs/dust/belle2/user/axelheim/MC_studies/ROEcleanup/caupi/onlineRawData/test/"
+#outpath="/nfs/dust/belle2/user/axelheim/MC_studies/ROEcleanup/caupi/onlineRawData/test/"
+outpath="/nfs/dust/belle2/user/axelheim/MC_studies/ROEcleanup/caupi/onlineRawData/firstRun/"
 
 
 path = b2.create_path()
@@ -231,7 +236,7 @@ ma.variablesToNtuple('gamma:forX', variables=outvars_FSPs, filename=outpath + 'g
 
 
 
-b2.process(path, max_event=80000)
+b2.process(path) #, max_event=80000)
 
 print(b2.statistics)
 
