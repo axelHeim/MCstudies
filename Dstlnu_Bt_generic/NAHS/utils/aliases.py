@@ -15,7 +15,7 @@ def define_aliases_Bsig():
     alias_dict['Bsig_genMotherPDG'] = 'genMotherPDG'
     alias_dict['Bsig_mcPDG'] = 'mcPDG'
     alias_dict['Bsig_PDG'] = 'PDG'
-    alias_dict['Bsig_isSignal'] = 'isSignal'
+    alias_dict['Bsig_isSignal'] = 'isSignalAcceptMissingNeutrino'
     alias_dict['Bsig_motherUniqParID'] = 'mcMother(uniqueParticleIdentifier)'
     alias_dict['basf2Bsig_uniqParID'] = 'uniqueParticleIdentifier'
     alias_dict['Bsig_genParticleID'] = 'genParticleID'

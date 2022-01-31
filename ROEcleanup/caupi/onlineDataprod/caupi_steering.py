@@ -51,7 +51,7 @@ outvars_FSPs += nn_vars
 identifier = str(sys.argv[1])
 
 #outpath="/nfs/dust/belle2/user/axelheim/MC_studies/ROEcleanup/caupi/onlineRawData/test/"
-outpath="/nfs/dust/belle2/user/axelheim/MC_studies/ROEcleanup/caupi/onlineRawData/firstRun/"
+outpath="/nfs/dust/belle2/user/axelheim/MC_studies/ROEcleanup/caupi/onlineRawData/Bsig_isSig1/"
 
 
 path = b2.create_path()
@@ -118,17 +118,18 @@ stdPi0s('eff40_May2020', path=path) # same as Giannas loose list: https://softwa
 
 #ma.reconstructDecay('pi0:forX -> gamma:all gamma:all','M > 0.124 and M < 0.140', path=path)
 
-ma.fillParticleList('K-:forX',"dr < 2 and abs(dz) < 4 and pt > 0.3 and kaonID > 0.6 \
-and pionID<0.6 and muonID < 0.9 and electronID < 0.9  and theta > 0.297 and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1", path=path)
-ma.fillParticleList('pi+:forX',"dr < 2 and abs(dz) < 4 and pt > 0.3 and pionID > 0.6 \
-and kaonID < 0.6 and electronID < 0.9 and  muonID < 0.9 and theta > 0.297 and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1", path=path)
-ma.fillParticleList('e+:cande',"abs(d0) < 0.5 and abs(dz) < 2 and pt > 0.3 and useCMSFrame(p)>1 and electronID > 0.9 and theta > 0.297 and theta < 2.618", path=path)
-ma.fillParticleList('mu+:candmu', "abs(d0) < 0.5 and abs(dz) < 2 and pt > 0.3 and useCMSFrame(p)>1 and muonID > 0.9 and electronID < 0.9 and theta > 0.297 and theta < 2.618", path=path)
-
+ma.fillParticleList('K-:forX',"dr < 2 and abs(dz) < 4 and pt > 0.3 and kaonID > 0.6 and pionID<0.6 and \
+            muonID < 0.9 and electronID < 0.9  and theta > 0.297 and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1", path=path)
+ma.fillParticleList('pi+:forX',"dr < 2 and abs(dz) < 4 and pt > 0.3 and pionID > 0.6 and kaonID < 0.6 and \
+            electronID < 0.9 and  muonID < 0.9 and theta > 0.297 and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1", path=path)
+ma.fillParticleList('e+:cande',"abs(d0) < 0.5 and abs(dz) < 2 and pt > 0.3 and useCMSFrame(p)>1 and \
+            electronID > 0.9 and theta > 0.297 and theta < 2.618", path=path)
+ma.fillParticleList('mu+:candmu', "abs(d0) < 0.5 and abs(dz) < 2 and pt > 0.3 and useCMSFrame(p)>1 and \
+            muonID > 0.9 and electronID < 0.9 and theta > 0.297 and theta < 2.618", path=path)
 ma.fillParticleList('p+:forX',"dr < 2 and abs(dz) < 4 and pt > 0.3 and protonID > 0.6 and kaonID < 0.6 \
-and pionID<0.6 and muonID < 0.9 and electronID < 0.9  and theta > 0.297 and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1", path=path)
-
-ma.cutAndCopyList('gamma:forX', 'gamma:all', "[clusterReg==1 and pt>0.02 and clusterZernikeMVA > 0.35] or [clusterReg==2 and pt>0.03 and clusterZernikeMVA > 0.15] or [clusterReg==3 and pt>0.02 and clusterZernikeMVA > 0.4]", path=path)
+            and pionID<0.6 and muonID < 0.9 and electronID < 0.9  and theta > 0.297 and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1", path=path)
+ma.cutAndCopyList('gamma:forX', 'gamma:all', "[clusterReg==1 and pt>0.02 and clusterZernikeMVA > 0.35] or \
+            [clusterReg==2 and pt>0.03 and clusterZernikeMVA > 0.15] or [clusterReg==3 and pt>0.02 and clusterZernikeMVA > 0.4]", path=path)
 
 
 roeinputs = ['gamma:forX','pi+:forX','K+:forX','p+:forX', 'e+:cande','mu+:candmu']
@@ -169,10 +170,11 @@ ma.cutAndCopyList('anti-B0:BCS', 'anti-B0:sig', "", path=path)
 ma.rankByLowest("anti-B0:BCS", 'abs(chiProb)', numBest=1, outputVariable='chiSq_rank', path=path)
 v.addAlias('chiSquare_rank', 'extraInfo(chiSq_rank)')
 
-
+# cut for Bsig isSig==1
+ma.cutAndCopyList('anti-B0:BCS2',"anti-B0:BCS",'[isSignalAcceptMissingNeutrino == 1]', path= path)
 
 # only proceed if the list con tain exactly one Bsig candidate
-ma.applyEventCuts('[countInList(anti-B0:BCS) == 1]', path)
+ma.applyEventCuts('[countInList(anti-B0:BCS2) == 1]', path)
 
 
 
@@ -182,7 +184,10 @@ print(AliasDictBsig)
 add_aliases(AliasDictBsig)
 outvars_Bsig = list(AliasDictBsig.keys()) 
 
-ma.variablesToNtuple('anti-B0:BCS',
+
+
+
+ma.variablesToNtuple('anti-B0:BCS2',
                   ['chiSquare_rank', 'chiProb'] + outvars_Bsig,
                   filename=outpath + 'Bsig_cand_' + identifier + '.root',
                   path=path)
@@ -236,7 +241,7 @@ ma.variablesToNtuple('gamma:forX', variables=outvars_FSPs, filename=outpath + 'g
 
 
 
-b2.process(path) #, max_event=80000)
+b2.process(path)#, max_event=40000)
 
 print(b2.statistics)
 
