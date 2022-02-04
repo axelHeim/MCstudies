@@ -2,13 +2,13 @@
 # no source, no conda deactivate
 
 
-import basf2 as b2 
+import basf2 as b2
 
 import modularAnalysis as ma
 from variables import variables as v
 import variables.collections as vc
 
-
+from stdCharged import stdMostLikely
 from stdCharged import stdCharged
 from stdPhotons import stdPhotons 
 from stdPi0s import stdPi0s
@@ -51,7 +51,7 @@ outvars_FSPs += nn_vars
 identifier = str(sys.argv[1])
 
 #outpath="/nfs/dust/belle2/user/axelheim/MC_studies/ROEcleanup/caupi/onlineRawData/test/"
-outpath="/nfs/dust/belle2/user/axelheim/MC_studies/ROEcleanup/caupi/onlineRawData/Bsig_isSig1/"
+outpath="/nfs/dust/belle2/user/axelheim/MC_studies/ROEcleanup/caupi/onlineRawData/svenjasCutsRun1/"
 
 
 path = b2.create_path()
@@ -116,24 +116,10 @@ stdCharged('pi','all', path=path)
 stdCharged('K','all', path=path)
 stdPi0s('eff40_May2020', path=path) # same as Giannas loose list: https://software.belle2.org/sphinx/release-04-02-09/_modules/stdPi0s.html#stdPi0s
 
-#ma.reconstructDecay('pi0:forX -> gamma:all gamma:all','M > 0.124 and M < 0.140', path=path)
-
-ma.fillParticleList('K-:forX',"dr < 2 and abs(dz) < 4 and pt > 0.3 and kaonID > 0.6 and pionID<0.6 and \
-            muonID < 0.9 and electronID < 0.9  and theta > 0.297 and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1", path=path)
-ma.fillParticleList('pi+:forX',"dr < 2 and abs(dz) < 4 and pt > 0.3 and pionID > 0.6 and kaonID < 0.6 and \
-            electronID < 0.9 and  muonID < 0.9 and theta > 0.297 and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1", path=path)
 ma.fillParticleList('e+:cande',"abs(d0) < 0.5 and abs(dz) < 2 and pt > 0.3 and useCMSFrame(p)>1 and \
             electronID > 0.9 and theta > 0.297 and theta < 2.618", path=path)
 ma.fillParticleList('mu+:candmu', "abs(d0) < 0.5 and abs(dz) < 2 and pt > 0.3 and useCMSFrame(p)>1 and \
             muonID > 0.9 and electronID < 0.9 and theta > 0.297 and theta < 2.618", path=path)
-ma.fillParticleList('p+:forX',"dr < 2 and abs(dz) < 4 and pt > 0.3 and protonID > 0.6 and kaonID < 0.6 \
-            and pionID<0.6 and muonID < 0.9 and electronID < 0.9  and theta > 0.297 and theta < 2.618 and nCDCHits > 0 and thetaInCDCAcceptance==1", path=path)
-ma.cutAndCopyList('gamma:forX', 'gamma:all', "[clusterReg==1 and pt>0.02 and clusterZernikeMVA > 0.35] or \
-            [clusterReg==2 and pt>0.03 and clusterZernikeMVA > 0.15] or [clusterReg==3 and pt>0.02 and clusterZernikeMVA > 0.4]", path=path)
-
-
-roeinputs = ['gamma:forX','pi+:forX','K+:forX','p+:forX', 'e+:cande','mu+:candmu']
-
 
 
 ma.cutAndCopyList('pi+:slow', 'pi+:all', 'abs(d0) < 0.5 and abs(z0) < 2', path=path)
@@ -171,10 +157,10 @@ ma.rankByLowest("anti-B0:BCS", 'abs(chiProb)', numBest=1, outputVariable='chiSq_
 v.addAlias('chiSquare_rank', 'extraInfo(chiSq_rank)')
 
 # cut for Bsig isSig==1
-ma.cutAndCopyList('anti-B0:BCS2',"anti-B0:BCS",'[isSignalAcceptMissingNeutrino == 1]', path= path)
+# ma.cutAndCopyList('anti-B0:BCS2',"anti-B0:BCS",'[isSignalAcceptMissingNeutrino == 1]', path= path)
 
 # only proceed if the list con tain exactly one Bsig candidate
-ma.applyEventCuts('[countInList(anti-B0:BCS2) == 1]', path)
+ma.applyEventCuts('[countInList(anti-B0:BCS) == 1]', path)
 
 
 
@@ -187,38 +173,42 @@ outvars_Bsig = list(AliasDictBsig.keys())
 
 
 
-ma.variablesToNtuple('anti-B0:BCS2',
+ma.variablesToNtuple('anti-B0:BCS',
                   ['chiSquare_rank', 'chiProb'] + outvars_Bsig,
                   filename=outpath + 'Bsig_cand_' + identifier + '.root',
                   path=path)
 
 
+# fill FSP lists according to svenja cuts she gave from here (03.02.22): /home/belle/sgrande/code/wg1_b2pilnu/scripts/pilnuReconstruction.py
+stdMostLikely(path=path)
+
+## the cuts:
+track_cleanup = 'pt > 0.05'
+track_cleanup += ' and thetaInCDCAcceptance'
+track_cleanup += ' and abs(dz) < 3.0'
+track_cleanup += ' and abs(dr) < 1.0'
+track_cleanup += ' and E < 5.5'
+gamma_cleanup = '[[clusterReg==1 and pt>0.03] or [clusterReg==2 and pt>0.04] or [clusterReg==3 and pt>0.06]]'
+gamma_cleanup += ' and thetaInCDCAcceptance'
+gamma_cleanup += ' and E < 5.5'
+gamma_cleanup += ' and clusterNHits > 1.5'
+gamma_cleanup += ' and abs(clusterTiming) < 200'
 
 
-
-""" 
-track_selection=" and ".join(
-            [
-                "[dr < 2]",
-                "[abs(dz) < 4]",
-                "[nCDCHits > 0]",
-                "[thetaInCDCAcceptance==1]"
-            ]
-)
-ecl_selection="[[[clusterReg==1] and [pt>0.02] and [clusterZernikeMVA > 0.35]] or [[clusterReg==2] and [pt>0.03] and [clusterZernikeMVA > 0.15]] or [[clusterReg==3] and [pt>0.02] and [clusterZernikeMVA > 0.4]]]"
-roe_mask = (track_selection, ecl_selection)
+ma.cutAndCopyList('gamma:save',"gamma:all", gamma_cleanup, path= path)
+ma.cutAndCopyList('pi+:save',"pi+:mostlikely", track_cleanup, path= path)
+ma.cutAndCopyList('K+:save',"K+:mostlikely", track_cleanup, path= path)
+ma.cutAndCopyList('e+:save',"e+:mostlikely", track_cleanup, path= path)
+ma.cutAndCopyList('mu+:save',"mu+:mostlikely", track_cleanup, path= path)
+ma.cutAndCopyList('p+:save',"p+:mostlikely", track_cleanup, path= path)
 
 
-ma.appendROEMask('anti-B0:sig', "cleanMask", roe_mask[0], roe_mask[1], path=path)
-ma.buildContinuumSuppression('anti-B0:sig', 'cleanMask',path=path)
- """
- 
  
 v.addAlias('Bsig_used', 'isDescendantOfList(anti-B0:BCS)')
-
+""" 
 pdg.add_particle("ROE_of_Bsig", 98766789, 0, 0, 0, 0)
 ma.combineAllParticles(roeinputs, "ROE_of_Bsig:all", cut='[Bsig_used == 0]', path=path)
-
+ """
 outvars_FSPs.append('Bsig_used')
 
 # delete duplicates in outvars
@@ -231,17 +221,17 @@ outvars_FSPs = list(OrderedDict.fromkeys(outvars_FSPs))
 
 
 # save all FSPs
-ma.variablesToNtuple('pi+:forX', variables=outvars_FSPs, filename=outpath + 'pions_' + identifier + '.root', path=path)
-ma.variablesToNtuple('K+:forX', variables=outvars_FSPs, filename=outpath + 'kaons_' + identifier + '.root', path=path)
-ma.variablesToNtuple('e+:cande', variables=outvars_FSPs, filename=outpath + 'electrons_' + identifier + '.root', path=path)
-ma.variablesToNtuple('mu+:candmu', variables=outvars_FSPs, filename=outpath + 'muons_' + identifier + '.root', path=path)
-ma.variablesToNtuple('p+:forX', variables=outvars_FSPs, filename=outpath + 'protons_' + identifier + '.root', path=path)
-ma.variablesToNtuple('gamma:forX', variables=outvars_FSPs, filename=outpath + 'gammas_' + identifier + '.root', path=path)
+ma.variablesToNtuple('pi+:save', variables=outvars_FSPs, filename=outpath + 'pions_' + identifier + '.root', path=path)
+ma.variablesToNtuple('K+:save', variables=outvars_FSPs, filename=outpath + 'kaons_' + identifier + '.root', path=path)
+ma.variablesToNtuple('e+:save', variables=outvars_FSPs, filename=outpath + 'electrons_' + identifier + '.root', path=path)
+ma.variablesToNtuple('mu+:save', variables=outvars_FSPs, filename=outpath + 'muons_' + identifier + '.root', path=path)
+ma.variablesToNtuple('gamma:save', variables=outvars_FSPs, filename=outpath + 'gammas_' + identifier + '.root', path=path)
+ma.variablesToNtuple('p+:save', variables=outvars_FSPs, filename=outpath + 'protons_' + identifier + '.root', path=path)
 
 
 
 
-b2.process(path)#, max_event=40000)
+b2.process(path)#, max_event=2000)
 
 print(b2.statistics)
 
