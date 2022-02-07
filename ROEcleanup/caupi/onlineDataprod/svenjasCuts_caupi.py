@@ -188,6 +188,7 @@ track_cleanup += ' and thetaInCDCAcceptance'
 track_cleanup += ' and abs(dz) < 3.0'
 track_cleanup += ' and abs(dr) < 1.0'
 track_cleanup += ' and E < 5.5'
+
 gamma_cleanup = '[[clusterReg==1 and pt>0.03] or [clusterReg==2 and pt>0.04] or [clusterReg==3 and pt>0.06]]'
 gamma_cleanup += ' and thetaInCDCAcceptance'
 gamma_cleanup += ' and E < 5.5'
